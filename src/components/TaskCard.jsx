@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flame, Check, Trash2, Calendar, Move, AlertCircle } from 'lucide-react';
+import { Flame, Check, Trash2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 const DAY_SHORT_NAMES = {
@@ -20,10 +20,9 @@ export default function TaskCard({
 }) {
   const handleComplete = (e) => {
     e.stopPropagation();
-    // Fire celebratory confetti on task completion
     confetti({
-      particleCount: 40,
-      spread: 60,
+      particleCount: 30,
+      spread: 50,
       origin: { y: 0.7 }
     });
     onToggleComplete(task.id);
@@ -49,57 +48,43 @@ export default function TaskCard({
       }}
     >
       <div className="task-card-main">
-        {/* Completion Checkbox */}
+        {/* Checkbox */}
         <button 
           className="task-checkbox"
           onClick={handleComplete}
-          title="Mark task as completed"
+          title="Mark task completed"
         >
-          <Check size={13} className="text-emerald-500 opacity-0 hover:opacity-100" />
+          <Check size={11} className="text-emerald-500 opacity-0 hover:opacity-100" />
         </button>
 
-        <div className="task-card-content">
-          <div className="task-title">{task.title}</div>
-          
-          <div className="task-meta">
-            {/* Priority Indicator */}
-            {task.isHighPriority && (
-              <span className="priority-badge">
-                <Flame size={11} />
-                High Priority
-              </span>
-            )}
+        {/* Task Title */}
+        <span className="task-title" title={task.title}>{task.title}</span>
 
-            {/* Scheduled Day Indicator */}
-            {task.scheduledDay && (
-              <span className="day-badge">
-                <Calendar size={11} style={{ marginRight: '3px' }} />
-                {DAY_SHORT_NAMES[task.scheduledDay] || task.scheduledDay}
-              </span>
-            )}
-          </div>
-        </div>
+        {/* Day Badge if Scheduled */}
+        {task.scheduledDay && (
+          <span className="day-badge">
+            {DAY_SHORT_NAMES[task.scheduledDay] || task.scheduledDay}
+          </span>
+        )}
+      </div>
 
-        {/* Task Card Actions */}
-        <div className="task-actions">
-          {/* High Priority Flame Toggle */}
-          <button 
-            className={`task-action-btn priority-toggle ${task.isHighPriority ? 'active' : ''}`}
-            onClick={handlePriorityToggle}
-            title={task.isHighPriority ? "Remove High Priority" : "Mark High Priority"}
-          >
-            <Flame size={15} />
-          </button>
+      {/* Actions */}
+      <div className="task-actions">
+        <button 
+          className={`task-action-btn priority-toggle ${task.isHighPriority ? 'active' : ''}`}
+          onClick={handlePriorityToggle}
+          title={task.isHighPriority ? "High Priority (Click to remove)" : "Mark High Priority"}
+        >
+          <Flame size={13} />
+        </button>
 
-          {/* Delete Task */}
-          <button 
-            className="task-action-btn"
-            onClick={handleDelete}
-            title="Delete task"
-          >
-            <Trash2 size={14} />
-          </button>
-        </div>
+        <button 
+          className="task-action-btn"
+          onClick={handleDelete}
+          title="Delete task"
+        >
+          <Trash2 size={12} />
+        </button>
       </div>
     </div>
   );
