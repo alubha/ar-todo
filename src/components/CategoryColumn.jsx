@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, MoreVertical, Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import TaskCard from './TaskCard';
 
 export default function CategoryColumn({
@@ -8,6 +8,7 @@ export default function CategoryColumn({
   onAddTask,
   onToggleComplete,
   onTogglePriority,
+  onUpdateTaskTitle,
   onDeleteTask,
   onDropTaskToCategory,
   onDeleteCategory
@@ -47,7 +48,7 @@ export default function CategoryColumn({
         <div className="category-title-group">
           <div 
             className="category-color-dot" 
-            style={{ backgroundColor: category.color || '#6366f1' }}
+            style={{ backgroundColor: category.color || '#4f46e5' }}
           />
           <h3 className="category-name">{category.name}</h3>
           <span className="category-task-count">{tasks.length}</span>
@@ -59,7 +60,7 @@ export default function CategoryColumn({
             onClick={() => onDeleteCategory(category.id)}
             title="Remove Category"
           >
-            <Trash2 size={13} />
+            <Trash2 size={12} />
           </button>
         )}
       </div>
@@ -73,15 +74,16 @@ export default function CategoryColumn({
       >
         {tasks.length === 0 ? (
           <div className="empty-state">
-            No tasks in this category
+            No tasks
           </div>
         ) : (
           tasks.map(task => (
             <TaskCard
-              key={task.id}
+              key={`category-${task.id}`}
               task={task}
               onToggleComplete={onToggleComplete}
               onTogglePriority={onTogglePriority}
+              onUpdateTaskTitle={onUpdateTaskTitle}
               onDeleteTask={onDeleteTask}
             />
           ))
@@ -98,7 +100,7 @@ export default function CategoryColumn({
           onChange={(e) => setNewTaskTitle(e.target.value)}
         />
         <button type="submit" className="add-task-btn" title="Add Task">
-          <Plus size={16} />
+          <Plus size={14} />
         </button>
       </form>
     </div>

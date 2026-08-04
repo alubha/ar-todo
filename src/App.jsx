@@ -1,20 +1,18 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
-  CheckCircle2, 
   Flame, 
   Plus, 
   Moon, 
   Sun, 
   Calendar, 
   FolderPlus, 
-  Layout, 
-  ShieldCheck,
+  CheckCircle2,
   RotateCcw
 } from 'lucide-react';
 import AuthModal from './components/AuthModal';
 import WeeklyPlanner from './components/WeeklyPlanner';
 import CategoryColumn from './components/CategoryColumn';
-import TaskCard from './components/TaskCard';
+import CompletedModal from './components/CompletedModal';
 
 // Default Initial Categories per Tab
 const INITIAL_CATEGORIES = {
@@ -46,7 +44,8 @@ const INITIAL_TASKS = [
     categoryId: 'tech',
     isHighPriority: true,
     scheduledDay: 'mon',
-    isCompleted: false
+    isCompleted: false,
+    completedAt: null
   },
   {
     id: 't-2',
@@ -55,7 +54,8 @@ const INITIAL_TASKS = [
     categoryId: 'clean',
     isHighPriority: false,
     scheduledDay: 'sat',
-    isCompleted: false
+    isCompleted: false,
+    completedAt: null
   },
   {
     id: 't-3',
@@ -64,7 +64,8 @@ const INITIAL_TASKS = [
     categoryId: 'scheduling',
     isHighPriority: true,
     scheduledDay: 'tue',
-    isCompleted: false
+    isCompleted: false,
+    completedAt: null
   },
   {
     id: 't-4',
@@ -73,7 +74,8 @@ const INITIAL_TASKS = [
     categoryId: 'networking',
     isHighPriority: false,
     scheduledDay: 'wed',
-    isCompleted: false
+    isCompleted: false,
+    completedAt: null
   },
   {
     id: 't-5',
@@ -82,7 +84,8 @@ const INITIAL_TASKS = [
     categoryId: 'finance',
     isHighPriority: true,
     scheduledDay: 'thu',
-    isCompleted: false
+    isCompleted: false,
+    completedAt: null
   }
 ];
 
@@ -95,13 +98,16 @@ export default function App() {
   // Active Tab State: 'personal' | 'work' | 'ap'
   const [activeTab, setActiveTab] = useState('personal');
 
-  // Theme State: 'dark' | 'light'
+  // Theme State: 'light' (default) | 'dark'
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('artodo_theme') || 'dark';
+    return localStorage.getItem('artodo_theme') || 'light';
   });
 
   // Collapsible Weekly Planner View State
   const [isPlannerExpanded, setIsPlannerExpanded] = useState(true);
+
+  // Completed Archive Modal State
+  const [isCompletedModalOpen, setIsCompletedModalOpen] = useState(false);
 
   // Categories State
   const [categories, setCategories] = useState(() => {
@@ -140,7 +146,7 @@ export default function App() {
   };
 
   const toggleTheme = () => {
-    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
   };
 
   // Task Handlers
@@ -152,19 +158,59 @@ export default function App() {
       categoryId,
       isHighPriority: false,
       scheduledDay: null,
-      isCompleted: false
+      isCompleted: false,
+      completedAt: null
     };
     setTasks(prev => [...prev, newTask]);
   };
 
+  // Complete Task (disappears from both list & calendar view, archived with timestamp)
   const handleToggleComplete = (taskId) => {
-    setTasks(prev => prev.filter(t => t.id !== taskId));
+    setTasks(prev => prev.map(t => {
+      if (t.id === taskId) {
+        return {
+          ...t,
+          isCompleted: true,
+          completedAt: Date.now()
+        };
+      }
+      return t;
+    }));
+  };
+
+  // Restore Completed Task back to active lists
+  const handleRestoreTask = (taskId) => {
+    setTasks(prev => prev.map(t => {
+      if (t.id === taskId) {
+        return {
+          ...t,
+          isCompleted: false,
+          completedAt: null
+        };
+      }
+      return t;
+    }));
+  };
+
+  // Clear Completed History
+  const handleClearCompletedHistory = () => {
+    setTasks(prev => prev.filter(t => !t.isCompleted));
   };
 
   const handleTogglePriority = (taskId) => {
     setTasks(prev => prev.map(t => {
       if (t.id === taskId) {
         return { ...t, isHighPriority: !t.isHighPriority };
+      }
+      return t;
+    }));
+  };
+
+  // Inline Title Update (Reflects in both list and calendar view)
+  const handleUpdateTaskTitle = (taskId, newTitle) => {
+    setTasks(prev => prev.map(t => {
+      if (t.id === taskId) {
+        return { ...t, title: newTitle };
       }
       return t;
     }));
@@ -188,6 +234,7 @@ export default function App() {
     }));
   };
 
+  // Drag to Calendar View (Task remains in category list while also appearing in calendar day!)
   const handleDropTaskToDay = (taskId, targetDayKey) => {
     setTasks(prev => prev.map(t => {
       if (t.id === taskId) {
@@ -205,7 +252,7 @@ export default function App() {
     e.preventDefault();
     if (!newCategoryName.trim()) return;
 
-    const colors = ['#6366f1', '#06b6d4', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#3b82f6'];
+    const colors = ['#4f46e5', '#06b6d4', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#3b82f6'];
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
 
     const newCat = {
@@ -228,21 +275,20 @@ export default function App() {
       ...prev,
       [activeTab]: (prev[activeTab] || []).filter(c => c.id !== catId)
     }));
-    // Remove tasks associated with category
     setTasks(prev => prev.filter(t => t.categoryId !== catId));
   };
 
   // Duplicate Week Feature
   const handleDuplicateWeek = () => {
-    // Duplicate all tasks that have a scheduled day into a fresh week schedule template
-    const scheduledTasks = tasks.filter(t => t.scheduledDay);
+    const scheduledTasks = tasks.filter(t => t.scheduledDay && !t.isCompleted);
     if (scheduledTasks.length === 0) return;
 
     const duplicatedTasks = scheduledTasks.map(t => ({
       ...t,
       id: `task-dup-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
       title: `${t.title} (Copy)`,
-      isCompleted: false
+      isCompleted: false,
+      completedAt: null
     }));
 
     setTasks(prev => [...prev, ...duplicatedTasks]);
@@ -251,6 +297,13 @@ export default function App() {
   // High Priority Tasks Across ALL Categories & Tabs
   const allHighPriorityTasks = useMemo(() => {
     return tasks.filter(t => t.isHighPriority && !t.isCompleted);
+  }, [tasks]);
+
+  // Completed Tasks Sorted by Most Recently Completed (Newest First)
+  const completedTasksSorted = useMemo(() => {
+    return tasks
+      .filter(t => t.isCompleted)
+      .sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0));
   }, [tasks]);
 
   // Current Tab Categories & Tasks
@@ -311,12 +364,22 @@ export default function App() {
 
         {/* Header Actions */}
         <div className="header-controls">
+          {/* Completed Archive Button */}
+          <button 
+            className="action-btn-sm"
+            onClick={() => setIsCompletedModalOpen(true)}
+            title="View Completed Tasks Archive"
+          >
+            <CheckCircle2 size={13} className="text-emerald-600" />
+            <span>Completed ({completedTasksSorted.length})</span>
+          </button>
+
           <button 
             className={`icon-btn ${isPlannerExpanded ? 'active-planner' : ''}`}
             onClick={() => setIsPlannerExpanded(prev => !prev)}
             title="Toggle Weekly Planning View"
           >
-            <Calendar size={17} />
+            <Calendar size={15} />
           </button>
 
           <button 
@@ -324,7 +387,7 @@ export default function App() {
             onClick={toggleTheme}
             title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
           >
-            {theme === 'light' ? <Moon size={17} /> : <Sun size={17} />}
+            {theme === 'light' ? <Moon size={15} /> : <Sun size={15} />}
           </button>
         </div>
       </header>
@@ -332,26 +395,23 @@ export default function App() {
       {/* Main Body Area */}
       <main className="main-content">
         {/* ========================================================================= */}
-        {/* HIGH PRIORITY QUICK GLANCE SECTION (TOP HERO BANNER ACROSS ALL CATEGORIES)*/}
+        {/* HIGH PRIORITY QUICK GLANCE SECTION                                        */}
         {/* ========================================================================= */}
         {allHighPriorityTasks.length > 0 && (
           <section className="high-priority-banner">
-            <div className="high-priority-banner-header">
-              <div className="high-priority-title-wrap">
-                <div className="priority-icon-badge">
-                  <Flame size={16} />
-                </div>
-                <h2>High Priority • Immediate Attention ({allHighPriorityTasks.length})</h2>
-              </div>
+            <div className="high-priority-header">
+              <Flame size={15} />
+              <span>High Priority Items ({allHighPriorityTasks.length})</span>
             </div>
 
             <div className="high-priority-grid">
               {allHighPriorityTasks.map(task => (
                 <TaskCard
-                  key={task.id}
+                  key={`hp-${task.id}`}
                   task={task}
                   onToggleComplete={handleToggleComplete}
                   onTogglePriority={handleTogglePriority}
+                  onUpdateTaskTitle={handleUpdateTaskTitle}
                   onDeleteTask={handleDeleteTask}
                 />
               ))}
@@ -360,7 +420,7 @@ export default function App() {
         )}
 
         {/* ========================================================================= */}
-        {/* WEEKLY PLANNING VIEW (MONDAY THROUGH SATURDAY TIMELINE)                  */}
+        {/* WEEKLY PLANNING VIEW (7-DAY SUNDAY THROUGH SATURDAY GRID)                 */}
         {/* ========================================================================= */}
         <WeeklyPlanner
           isExpanded={isPlannerExpanded}
@@ -368,6 +428,7 @@ export default function App() {
           tasks={tasks.filter(t => !t.isCompleted)}
           onToggleComplete={handleToggleComplete}
           onTogglePriority={handleTogglePriority}
+          onUpdateTaskTitle={handleUpdateTaskTitle}
           onDeleteTask={handleDeleteTask}
           onDropTaskToDay={handleDropTaskToDay}
           onDuplicateWeek={handleDuplicateWeek}
@@ -381,36 +442,36 @@ export default function App() {
             <h2 className="section-title">
               {activeTab === 'personal' && 'Personal Categories'}
               {activeTab === 'work' && 'Work Categories'}
-              {activeTab === 'ap' && 'AP Categories & Projects'}
+              {activeTab === 'ap' && 'AP Categories'}
             </h2>
 
             <button 
               className="action-btn-sm"
               onClick={() => setShowNewCatInput(prev => !prev)}
             >
-              <FolderPlus size={14} />
+              <FolderPlus size={13} />
               <span>Add Category</span>
             </button>
           </div>
 
           {/* New Category Inline Form */}
           {showNewCatInput && (
-            <form onSubmit={handleAddCategory} className="add-task-form" style={{ marginTop: '0.85rem', maxWidth: '380px' }}>
+            <form onSubmit={handleAddCategory} className="add-task-form" style={{ marginTop: '0.65rem', maxWidth: '320px' }}>
               <input
                 type="text"
                 className="add-task-input"
-                placeholder="Category name (e.g. Finance, Tech, Clean...)"
+                placeholder="Category name..."
                 value={newCategoryName}
                 onChange={(e) => setNewCategoryName(e.target.value)}
                 autoFocus
               />
               <button type="submit" className="add-task-btn">
-                <Plus size={16} />
+                <Plus size={14} />
               </button>
             </form>
           )}
 
-          <div className="categories-container" style={{ marginTop: '1.25rem' }}>
+          <div className="categories-container" style={{ marginTop: '0.85rem' }}>
             {currentCategories.map(cat => {
               const catTasks = activeTabTasks.filter(t => t.categoryId === cat.id);
               
@@ -422,6 +483,7 @@ export default function App() {
                   onAddTask={handleAddTask}
                   onToggleComplete={handleToggleComplete}
                   onTogglePriority={handleTogglePriority}
+                  onUpdateTaskTitle={handleUpdateTaskTitle}
                   onDeleteTask={handleDeleteTask}
                   onDropTaskToCategory={handleDropTaskToCategory}
                   onDeleteCategory={handleDeleteCategory}
@@ -431,6 +493,15 @@ export default function App() {
           </div>
         </section>
       </main>
+
+      {/* Completed Archive Modal */}
+      <CompletedModal
+        isOpen={isCompletedModalOpen}
+        onClose={() => setIsCompletedModalOpen(false)}
+        completedTasks={completedTasksSorted}
+        onRestoreTask={handleRestoreTask}
+        onClearCompletedHistory={handleClearCompletedHistory}
+      />
     </div>
   );
 }

@@ -23,6 +23,7 @@ export default function WeeklyPlanner({
   tasks,
   onToggleComplete,
   onTogglePriority,
+  onUpdateTaskTitle,
   onDeleteTask,
   onDropTaskToDay,
   onDuplicateWeek
@@ -103,10 +104,11 @@ export default function WeeklyPlanner({
                   ) : (
                     dayTasks.map(task => (
                       <TaskCard
-                        key={task.id}
+                        key={`planner-${task.id}`}
                         task={task}
                         onToggleComplete={onToggleComplete}
                         onTogglePriority={onTogglePriority}
+                        onUpdateTaskTitle={onUpdateTaskTitle}
                         onDeleteTask={onDeleteTask}
                       />
                     ))
