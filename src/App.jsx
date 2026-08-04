@@ -275,7 +275,7 @@ export default function App() {
     setTasks(prev => [...prev, newTask]);
   };
 
-  // Complete Task
+  // Complete Task (removes task everywhere, archives it with timestamp)
   const handleToggleComplete = (taskId) => {
     setTasks(prev => prev.map(t => {
       if (t.id === taskId) {
@@ -317,7 +317,7 @@ export default function App() {
     setTasks(prev => prev.filter(t => !t.isCompleted));
   };
 
-  // Priority toggle moves high priority tasks automatically to top of list
+  // Priority toggle (moves task into/out of Urgent column automatically)
   const handleTogglePriority = (taskId) => {
     setTasks(prev => prev.map(t => {
       if (t.id === taskId) {
@@ -480,6 +480,19 @@ export default function App() {
     return tasks.filter(t => t.tabId === activeTab && !t.isCompleted);
   }, [tasks, activeTab]);
 
+  // Urgent High Priority Tasks for Active Tab
+  const urgentTabTasks = useMemo(() => {
+    return activeTabTasks.filter(t => t.isHighPriority);
+  }, [activeTabTasks]);
+
+  const autoUrgentCategory = useMemo(() => ({
+    id: 'urgent-auto-col',
+    name: 'Urgent',
+    icon: 'flame',
+    color: '#ef4444',
+    isAutoUrgent: true
+  }), []);
+
   // If not authenticated, render password lock screen
   if (!isAuthenticated) {
     return <AuthModal onAuthenticate={handleAuthenticate} />;
@@ -541,7 +554,7 @@ export default function App() {
             <Calendar size={15} />
           </button>
 
-          {/* Tab Settings Gear Icon (Right next to Calendar icon) */}
+          {/* Tab Settings Gear Icon */}
           <button
             className="icon-btn"
             onClick={() => setIsTabSettingsOpen(true)}
@@ -587,7 +600,7 @@ export default function App() {
         />
 
         {/* ========================================================================= */}
-        {/* CATEGORY COLUMNS GRID                                                     */}
+        {/* CATEGORY COLUMNS GRID (AUTO URGENT COLUMN ON LEFT-MOST SIDE)              */}
         {/* ========================================================================= */}
         <section>
           <div className="categories-grid-header">
@@ -622,6 +635,19 @@ export default function App() {
           )}
 
           <div className="categories-container" style={{ marginTop: '0.85rem' }}>
+            {/* Left-most Urgent Column (Appears automatically when at least 1 fire task exists!) */}
+            {urgentTabTasks.length > 0 && (
+              <CategoryColumn
+                key="urgent-auto-col"
+                category={autoUrgentCategory}
+                tasks={urgentTabTasks}
+                onToggleComplete={handleToggleComplete}
+                onTogglePriority={handleTogglePriority}
+                onUpdateTaskTitle={handleUpdateTaskTitle}
+                onDeleteTask={handleDeleteTask}
+              />
+            )}
+
             {currentCategories.map(cat => {
               // High Priority Tasks float automatically to the top of the column!
               const catTasks = activeTabTasks

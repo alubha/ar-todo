@@ -24,7 +24,9 @@ export default function CategoryColumn({
   const handleFormSubmit = (e) => {
     e.preventDefault();
     if (!newTaskTitle.trim()) return;
-    onAddTask(category.id, newTaskTitle.trim());
+    if (onAddTask) {
+      onAddTask(category.id, newTaskTitle.trim());
+    }
     setNewTaskTitle('');
   };
 
@@ -41,12 +43,16 @@ export default function CategoryColumn({
     e.preventDefault();
     setIsDragOver(false);
     const taskId = e.dataTransfer.getData('text/plain');
-    if (taskId) {
+    if (taskId && onDropTaskToCategory) {
       onDropTaskToCategory(taskId, category.id);
     }
   };
 
   const handleSaveCatName = () => {
+    if (category.isAutoUrgent) {
+      setIsEditingCatName(false);
+      return;
+    }
     if (catName.trim() && catName.trim() !== category.name) {
       onUpdateCategoryName(category.id, catName.trim());
     } else {
@@ -65,7 +71,7 @@ export default function CategoryColumn({
   };
 
   return (
-    <div className="category-column">
+    <div className={`category-column ${category.isAutoUrgent ? 'urgent-column' : ''}`}>
       {/* Category Column Header */}
       <div className="category-column-header">
         <div className="category-title-group">
@@ -73,10 +79,10 @@ export default function CategoryColumn({
           <CategoryIconPicker
             currentIcon={category.icon || 'tag'}
             currentColor={category.color || '#4f46e5'}
-            onSelectIcon={(data) => onUpdateCategoryIcon && onUpdateCategoryIcon(category.id, data)}
+            onSelectIcon={(data) => !category.isAutoUrgent && onUpdateCategoryIcon && onUpdateCategoryIcon(category.id, data)}
           />
 
-          {isEditingCatName ? (
+          {!category.isAutoUrgent && isEditingCatName ? (
             <input
               type="text"
               className="category-edit-input"
@@ -89,8 +95,8 @@ export default function CategoryColumn({
           ) : (
             <h3 
               className="category-name" 
-              title="Click to edit category name"
-              onClick={() => setIsEditingCatName(true)}
+              title={category.isAutoUrgent ? "Auto-generated Urgent column" : "Click to edit category name"}
+              onClick={() => !category.isAutoUrgent && setIsEditingCatName(true)}
             >
               {category.name}
             </h3>
@@ -99,7 +105,7 @@ export default function CategoryColumn({
           <span className="category-task-count">{tasks.length}</span>
         </div>
 
-        {onDeleteCategory && (
+        {!category.isAutoUrgent && onDeleteCategory && (
           <button 
             className="task-action-btn"
             onClick={() => onDeleteCategory(category.id)}
@@ -124,7 +130,7 @@ export default function CategoryColumn({
         ) : (
           tasks.map(task => (
             <TaskCard
-              key={`category-${task.id}`}
+              key={`category-${category.id}-${task.id}`}
               task={task}
               onToggleComplete={onToggleComplete}
               onTogglePriority={onTogglePriority}
@@ -135,19 +141,21 @@ export default function CategoryColumn({
         )}
       </div>
 
-      {/* Add Task Input Form */}
-      <form onSubmit={handleFormSubmit} className="add-task-form">
-        <input
-          type="text"
-          className="add-task-input"
-          placeholder="+ Add task..."
-          value={newTaskTitle}
-          onChange={(e) => setNewTaskTitle(e.target.value)}
-        />
-        <button type="submit" className="add-task-btn" title="Add Task">
-          <Plus size={14} />
-        </button>
-      </form>
+      {/* Add Task Input Form (hidden for Auto Urgent Column) */}
+      {!category.isAutoUrgent && (
+        <form onSubmit={handleFormSubmit} className="add-task-form">
+          <input
+            type="text"
+            className="add-task-input"
+            placeholder="+ Add task..."
+            value={newTaskTitle}
+            onChange={(e) => setNewTaskTitle(e.target.value)}
+          />
+          <button type="submit" className="add-task-btn" title="Add Task">
+            <Plus size={14} />
+          </button>
+        </form>
+      )}
     </div>
   );
 }
