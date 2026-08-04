@@ -484,6 +484,7 @@ export default function App() {
         isOpen={isCompletedModalOpen}
         onClose={() => setIsCompletedModalOpen(false)}
         completedTasks={completedTasksSorted}
+        categories={categories}
         onRestoreTask={handleRestoreTask}
         onClearCompletedHistory={handleClearCompletedHistory}
       />

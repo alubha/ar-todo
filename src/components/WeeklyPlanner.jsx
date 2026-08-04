@@ -1,10 +1,5 @@
 import React from 'react';
-import { 
-  CalendarDays, 
-  ChevronDown, 
-  ChevronUp, 
-  Copy 
-} from 'lucide-react';
+import { CalendarDays } from 'lucide-react';
 import TaskCard from './TaskCard';
 
 const DAYS_CONFIG = [
@@ -25,8 +20,7 @@ export default function WeeklyPlanner({
   onTogglePriority,
   onUpdateTaskTitle,
   onDeleteTask,
-  onDropTaskToDay,
-  onDuplicateWeek
+  onDropTaskToDay
 }) {
   const [dragOverDay, setDragOverDay] = React.useState(null);
 
@@ -50,31 +44,11 @@ export default function WeeklyPlanner({
 
   return (
     <div className="weekly-planner-container">
-      {/* Planner Collapsible Header */}
+      {/* Click Banner Anywhere to Expand/Collapse */}
       <div className="planner-header" onClick={onToggleExpand}>
         <div className="planner-title">
           <CalendarDays size={16} className="text-indigo-600" />
-          <span>Weekly Schedule (Mon – Sun)</span>
-        </div>
-
-        <div className="planner-actions" onClick={(e) => e.stopPropagation()}>
-          <button 
-            className="action-btn-sm"
-            onClick={onDuplicateWeek}
-            title="Duplicate scheduled week template"
-          >
-            <Copy size={12} />
-            <span>Duplicate Week</span>
-          </button>
-
-          <button 
-            className="icon-btn" 
-            onClick={onToggleExpand}
-            title={isExpanded ? "Collapse View" : "Expand View"}
-            style={{ width: '28px', height: '28px' }}
-          >
-            {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-          </button>
+          <span>Weekly Schedule</span>
         </div>
       </div>
 
@@ -82,7 +56,6 @@ export default function WeeklyPlanner({
       {isExpanded && (
         <div className="planner-days-grid">
           {DAYS_CONFIG.map((day) => {
-            // High Priority tasks float automatically to the top of each day's list!
             const dayTasks = tasks
               .filter(t => t.scheduledDay === day.key)
               .sort((a, b) => (b.isHighPriority ? 1 : 0) - (a.isHighPriority ? 1 : 0));
@@ -91,7 +64,6 @@ export default function WeeklyPlanner({
               <div key={day.key} className="planner-day-column">
                 <div className="day-header">
                   <span className="day-name">{day.name}</span>
-                  <span className="day-count">{dayTasks.length}</span>
                 </div>
 
                 <div 
