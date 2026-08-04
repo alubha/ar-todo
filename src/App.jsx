@@ -5,12 +5,20 @@ import {
   Sun, 
   Calendar, 
   FolderPlus, 
-  CheckCircle2
+  CheckCircle2,
+  X
 } from 'lucide-react';
 import AuthModal from './components/AuthModal';
 import WeeklyPlanner from './components/WeeklyPlanner';
 import CategoryColumn from './components/CategoryColumn';
 import CompletedModal from './components/CompletedModal';
+
+// Default Initial Tabs
+const DEFAULT_TABS = [
+  { id: 'personal', name: 'Personal' },
+  { id: 'work', name: 'Work' },
+  { id: 'ap', name: 'AP' }
+];
 
 // Default Initial Categories per Tab with Relevant Icons
 const INITIAL_CATEGORIES = {
@@ -93,8 +101,14 @@ export default function App() {
     return sessionStorage.getItem('artodo_authenticated') === 'true';
   });
 
-  // Active Tab State: 'personal' | 'work' | 'ap'
-  const [activeTab, setActiveTab] = useState('personal');
+  // Top-Level Tabs State
+  const [tabs, setTabs] = useState(() => {
+    const saved = localStorage.getItem('artodo_tabs_v2');
+    return saved ? JSON.parse(saved) : DEFAULT_TABS;
+  });
+
+  // Active Tab State: 'personal' | 'work' | 'ap' | custom
+  const [activeTab, setActiveTab] = useState(() => tabs[0]?.id || 'personal');
 
   // Theme State: 'light' (default) | 'dark'
   const [theme, setTheme] = useState(() => {
@@ -107,6 +121,10 @@ export default function App() {
   // Completed Archive Modal State
   const [isCompletedModalOpen, setIsCompletedModalOpen] = useState(false);
 
+  // New Tab Input State
+  const [showNewTabInput, setShowNewTabInput] = useState(false);
+  const [newTabName, setNewTabName] = useState('');
+
   // Categories State
   const [categories, setCategories] = useState(() => {
     const saved = localStorage.getItem('artodo_categories_v1');
@@ -117,6 +135,18 @@ export default function App() {
   const [tasks, setTasks] = useState(() => {
     const saved = localStorage.getItem('artodo_tasks_v1');
     return saved ? JSON.parse(saved) : INITIAL_TASKS;
+  });
+
+  // Archived Deleted Categories State
+  const [archivedCategories, setArchivedCategories] = useState(() => {
+    const saved = localStorage.getItem('artodo_archived_categories_v1');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // Archived Deleted Tabs State
+  const [archivedTabs, setArchivedTabs] = useState(() => {
+    const saved = localStorage.getItem('artodo_archived_tabs_v1');
+    return saved ? JSON.parse(saved) : [];
   });
 
   // New Category Input State
@@ -131,12 +161,24 @@ export default function App() {
 
   // Persist State to LocalStorage
   useEffect(() => {
+    localStorage.setItem('artodo_tabs_v2', JSON.stringify(tabs));
+  }, [tabs]);
+
+  useEffect(() => {
     localStorage.setItem('artodo_categories_v1', JSON.stringify(categories));
   }, [categories]);
 
   useEffect(() => {
     localStorage.setItem('artodo_tasks_v1', JSON.stringify(tasks));
   }, [tasks]);
+
+  useEffect(() => {
+    localStorage.setItem('artodo_archived_categories_v1', JSON.stringify(archivedCategories));
+  }, [archivedCategories]);
+
+  useEffect(() => {
+    localStorage.setItem('artodo_archived_tabs_v1', JSON.stringify(archivedTabs));
+  }, [archivedTabs]);
 
   const handleAuthenticate = () => {
     setIsAuthenticated(true);
@@ -145,6 +187,66 @@ export default function App() {
 
   const toggleTheme = () => {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+  };
+
+  // Top Level Tab Handlers
+  const handleCreateTab = (e) => {
+    e.preventDefault();
+    if (!newTabName.trim()) return;
+
+    const tabId = `tab-${Date.now()}`;
+    const newTab = { id: tabId, name: newTabName.trim() };
+
+    setTabs(prev => [...prev, newTab]);
+    setCategories(prev => ({ ...prev, [tabId]: [] }));
+    setActiveTab(tabId);
+    setNewTabName('');
+    setShowNewTabInput(false);
+  };
+
+  const handleDeleteTab = (tabId, e) => {
+    e.stopPropagation();
+    if (tabs.length <= 1) return; // Must keep at least 1 tab
+
+    const tabToDelete = tabs.find(t => t.id === tabId);
+    if (!tabToDelete) return;
+
+    const tabCatList = categories[tabId] || [];
+    const tabTaskList = tasks.filter(t => t.tabId === tabId);
+
+    // Archive tab
+    setArchivedTabs(prev => [...prev, { tab: tabToDelete, categories: tabCatList, tasks: tabTaskList }]);
+
+    // Remove tab
+    setTabs(prev => prev.filter(t => t.id !== tabId));
+    setTasks(prev => prev.filter(t => t.tabId !== tabId));
+    setCategories(prev => {
+      const copy = { ...prev };
+      delete copy[tabId];
+      return copy;
+    });
+
+    if (activeTab === tabId) {
+      const remaining = tabs.filter(t => t.id !== tabId);
+      setActiveTab(remaining[0]?.id || 'personal');
+    }
+  };
+
+  const handleRestoreTab = (tabId) => {
+    const archivedItem = archivedTabs.find(item => item.tab.id === tabId);
+    if (!archivedItem) return;
+
+    // Restore tab, categories, and tasks
+    setTabs(prev => [...prev, archivedItem.tab]);
+    setCategories(prev => ({
+      ...prev,
+      [tabId]: archivedItem.categories
+    }));
+    setTasks(prev => [...prev, ...archivedItem.tasks]);
+
+    // Remove from archivedTabs
+    setArchivedTabs(prev => prev.filter(item => item.tab.id !== tabId));
+    setActiveTab(tabId);
   };
 
   // Task Handlers
@@ -176,8 +278,18 @@ export default function App() {
     }));
   };
 
-  // Restore Completed Task back to active lists
+  // Restore Completed Task back to active lists (re-creates category if deleted!)
   const handleRestoreTask = (taskId) => {
+    const taskToRestore = tasks.find(t => t.id === taskId);
+    if (!taskToRestore) return;
+
+    // Check if task's category was deleted and exists in archivedCategories
+    const archivedCatItem = archivedCategories.find(c => c.category.id === taskToRestore.categoryId);
+    if (archivedCatItem) {
+      // Auto-restore category as well!
+      handleRestoreCategory(archivedCatItem.category.id);
+    }
+
     setTasks(prev => prev.map(t => {
       if (t.id === taskId) {
         return {
@@ -272,12 +384,53 @@ export default function App() {
     setShowNewCatInput(false);
   };
 
+  // Delete Category (Archives category & sub-tasks so they can be restored!)
   const handleDeleteCategory = (catId) => {
+    const catList = categories[activeTab] || [];
+    const catToDelete = catList.find(c => c.id === catId);
+    if (!catToDelete) return;
+
+    const catTasks = tasks.filter(t => t.categoryId === catId);
+
+    // Archive category with all sub-tasks
+    setArchivedCategories(prev => [
+      ...prev,
+      { category: catToDelete, tabId: activeTab, tasks: catTasks }
+    ]);
+
+    // Remove category from active view
     setCategories(prev => ({
       ...prev,
-      [activeTab]: (prev[activeTab] || []).filter(c => c.id !== catId)
+      [activeTab]: catList.filter(c => c.id !== catId)
     }));
+
+    // Remove tasks from active list
     setTasks(prev => prev.filter(t => t.categoryId !== catId));
+  };
+
+  // Restore Deleted Category & Sub-tasks
+  const handleRestoreCategory = (catId) => {
+    const archivedItem = archivedCategories.find(item => item.category.id === catId);
+    if (!archivedItem) return;
+
+    const targetTabId = archivedItem.tabId;
+
+    // Make sure target tab exists, if not recreate tab!
+    if (!tabs.some(t => t.id === targetTabId)) {
+      setTabs(prev => [...prev, { id: targetTabId, name: targetTabId.toUpperCase() }]);
+    }
+
+    // Add category back
+    setCategories(prev => ({
+      ...prev,
+      [targetTabId]: [...(prev[targetTabId] || []), archivedItem.category]
+    }));
+
+    // Add sub-tasks back
+    setTasks(prev => [...prev, ...archivedItem.tasks]);
+
+    // Remove from archivedCategories
+    setArchivedCategories(prev => prev.filter(item => item.category.id !== catId));
   };
 
   const handleUpdateCategoryName = (catId, newName) => {
@@ -334,37 +487,59 @@ export default function App() {
           <h1 className="header-title">AR To Do</h1>
         </div>
 
-        {/* 3 Main Tabs: Personal, Work, AP */}
-        <nav className="header-tabs">
-          <button 
-            className={`tab-btn ${activeTab === 'personal' ? 'active' : ''}`}
-            onClick={() => setActiveTab('personal')}
-          >
-            <span>Personal</span>
-            <span className="tab-count-badge">
-              {tasks.filter(t => t.tabId === 'personal' && !t.isCompleted).length}
-            </span>
-          </button>
+        {/* Top-Level Dynamic Tabs */}
+        <nav className="header-tabs" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+          {tabs.map(tab => (
+            <div key={tab.id} style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <button 
+                className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
+                onClick={() => setActiveTab(tab.id)}
+              >
+                <span>{tab.name}</span>
+                <span className="tab-count-badge">
+                  {tasks.filter(t => t.tabId === tab.id && !t.isCompleted).length}
+                </span>
 
-          <button 
-            className={`tab-btn ${activeTab === 'work' ? 'active' : ''}`}
-            onClick={() => setActiveTab('work')}
-          >
-            <span>Work</span>
-            <span className="tab-count-badge">
-              {tasks.filter(t => t.tabId === 'work' && !t.isCompleted).length}
-            </span>
-          </button>
+                {/* Option to delete custom top-level tab */}
+                {tabs.length > 1 && (
+                  <span 
+                    onClick={(e) => handleDeleteTab(tab.id, e)}
+                    title="Delete Tab"
+                    style={{ marginLeft: '4px', opacity: 0.6, display: 'flex', alignItems: 'center' }}
+                  >
+                    <X size={12} />
+                  </span>
+                )}
+              </button>
+            </div>
+          ))}
 
-          <button 
-            className={`tab-btn ${activeTab === 'ap' ? 'active' : ''}`}
-            onClick={() => setActiveTab('ap')}
-          >
-            <span>AP</span>
-            <span className="tab-count-badge">
-              {tasks.filter(t => t.tabId === 'ap' && !t.isCompleted).length}
-            </span>
-          </button>
+          {/* Add New Top-Level Tab Button */}
+          {showNewTabInput ? (
+            <form onSubmit={handleCreateTab} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <input
+                type="text"
+                className="add-task-input"
+                placeholder="Tab Name..."
+                value={newTabName}
+                onChange={(e) => setNewTabName(e.target.value)}
+                autoFocus
+                style={{ width: '100px', height: '28px', fontSize: '0.78rem' }}
+              />
+              <button type="submit" className="add-task-btn" style={{ height: '28px', padding: '0 6px' }}>
+                <Plus size={12} />
+              </button>
+            </form>
+          ) : (
+            <button 
+              className="action-btn-sm" 
+              onClick={() => setShowNewTabInput(true)}
+              title="Add New Top-Level Tab"
+              style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}
+            >
+              <Plus size={13} />
+            </button>
+          )}
         </nav>
 
         {/* Header Actions */}
@@ -373,10 +548,10 @@ export default function App() {
           <button 
             className="action-btn-sm"
             onClick={() => setIsCompletedModalOpen(true)}
-            title="View Completed Tasks Archive"
+            title="View Completed Tasks & Archive"
           >
             <CheckCircle2 size={13} className="text-emerald-600" />
-            <span>Completed ({completedTasksSorted.length})</span>
+            <span>Archive ({completedTasksSorted.length + archivedCategories.length + archivedTabs.length})</span>
           </button>
 
           <button 
@@ -419,9 +594,7 @@ export default function App() {
         <section>
           <div className="categories-grid-header">
             <h2 className="section-title">
-              {activeTab === 'personal' && 'Personal Categories'}
-              {activeTab === 'work' && 'Work Categories'}
-              {activeTab === 'ap' && 'AP Categories'}
+              {tabs.find(t => t.id === activeTab)?.name || 'Categories'}
             </h2>
 
             <button 
@@ -478,13 +651,17 @@ export default function App() {
         </section>
       </main>
 
-      {/* Completed Archive Modal */}
+      {/* Completed & Archives Modal */}
       <CompletedModal
         isOpen={isCompletedModalOpen}
         onClose={() => setIsCompletedModalOpen(false)}
         completedTasks={completedTasksSorted}
         categories={categories}
+        archivedCategories={archivedCategories}
+        archivedTabs={archivedTabs}
         onRestoreTask={handleRestoreTask}
+        onRestoreCategory={handleRestoreCategory}
+        onRestoreTab={handleRestoreTab}
         onClearCompletedHistory={handleClearCompletedHistory}
       />
     </div>

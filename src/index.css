@@ -297,39 +297,33 @@ button, input, select, textarea {
   width: 100%;
 }
 
-/* Weekday (Mon-Fri) Light Green Fill */
-.planner-day-column.weekday {
-  background: #f0fdf4;
-}
-
+/* Weekday (Mon-Fri) Light Green Header Banner */
 .planner-day-column.weekday .day-header {
+  background: #dcfce7;
   color: #166534;
   border-bottom: 1.5px solid #bbf7d0;
+  padding: 0.35rem 0.5rem;
+  border-radius: 4px;
 }
 
-/* Weekend (Sat-Sun) Light Blue Fill */
-.planner-day-column.weekend {
-  background: #eff6ff;
-}
-
+/* Weekend (Sat-Sun) Light Blue Header Banner */
 .planner-day-column.weekend .day-header {
+  background: #dbeafe;
   color: #1e40af;
   border-bottom: 1.5px solid #bfdbfe;
+  padding: 0.35rem 0.5rem;
+  border-radius: 4px;
 }
 
-/* Dark mode overrides for weekday/weekend */
-[data-theme="dark"] .planner-day-column.weekday {
-  background: #062c19;
-}
+/* Dark mode overrides for weekday/weekend headers */
 [data-theme="dark"] .planner-day-column.weekday .day-header {
+  background: #14532d;
   color: #86efac;
   border-bottom-color: #166534;
 }
 
-[data-theme="dark"] .planner-day-column.weekend {
-  background: #0b1f3a;
-}
 [data-theme="dark"] .planner-day-column.weekend .day-header {
+  background: #1e3a8a;
   color: #93c5fd;
   border-bottom-color: #1e40af;
 }
