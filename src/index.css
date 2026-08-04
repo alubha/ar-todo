@@ -207,7 +207,7 @@ button, input, select, textarea {
   gap: 1rem;
 }
 
-/* High Priority Section (Ultra Clean & Compact) */
+/* High Priority Section */
 .high-priority-banner {
   background: var(--high-priority-bg);
   border: 1px solid var(--high-priority-border);
@@ -231,7 +231,7 @@ button, input, select, textarea {
   gap: 0.4rem;
 }
 
-/* Weekly Planner (Compact Grid) */
+/* Weekly Planner */
 .weekly-planner-container {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
@@ -367,7 +367,7 @@ button, input, select, textarea {
   outline: 1.5px dashed var(--accent-primary);
 }
 
-/* Category Columns Grid */
+/* Category Columns Grid Header */
 .categories-grid-header {
   display: flex;
   align-items: center;
@@ -379,28 +379,30 @@ button, input, select, textarea {
   font-weight: 700;
 }
 
+/* Compact Masonry Multi-Column Container (Eliminates vertical whitespace gaps!) */
 .categories-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-  gap: 0.85rem;
-  align-items: start;
+  column-width: 270px;
+  column-gap: 0.85rem;
+  width: 100%;
 }
 
 .category-column {
+  break-inside: avoid;
+  margin-bottom: 0.85rem;
+  display: inline-block;
+  width: 100%;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   padding: 0.65rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  vertical-align: top;
 }
 
 .category-column-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: 0.3rem;
+  padding-bottom: 0.35rem;
 }
 
 .category-title-group {
@@ -429,7 +431,8 @@ button, input, select, textarea {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  min-height: 80px;
+  min-height: 40px;
+  margin-top: 0.35rem;
 }
 
 .category-dropzone.drag-over {
@@ -455,7 +458,7 @@ button, input, select, textarea {
   border-color: var(--border-highlight);
 }
 
-/* High Priority Task Card (Clean Light Accent - No Heavy Shadows) */
+/* High Priority Task Card */
 .task-card.high-priority {
   background: var(--high-priority-bg);
   border: 1px solid var(--high-priority-border);
@@ -572,7 +575,7 @@ button, input, select, textarea {
 .add-task-form {
   display: flex;
   gap: 0.35rem;
-  margin-top: 0.2rem;
+  margin-top: 0.4rem;
 }
 
 .add-task-input {
