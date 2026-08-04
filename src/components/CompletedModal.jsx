@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, RotateCcw, X, Trash2 } from 'lucide-react';
+import { CheckCircle2, RotateCcw, ArrowLeft, Trash2 } from 'lucide-react';
 
 const TAB_LABELS = {
   personal: 'Personal',
@@ -34,70 +34,76 @@ export default function CompletedModal({
   };
 
   return (
-    <div className="auth-overlay" onClick={onClose}>
-      <div 
-        className="auth-card" 
-        style={{ 
-          maxWidth: '520px', 
-          width: '92%', 
-          padding: '1.25rem 1.5rem',
-          maxHeight: '80vh',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1rem'
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Modal Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <CheckCircle2 size={18} className="text-emerald-600" />
-            <h2 style={{ fontSize: '1.05rem', fontWeight: 700 }}>Completed Tasks ({completedTasks.length})</h2>
-          </div>
-
+    <div className="completed-page-overlay">
+      {/* Full-Screen Page Header */}
+      <header className="app-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <button 
-            className="task-action-btn"
+            className="action-btn-sm"
             onClick={onClose}
-            title="Close"
+            title="Back to Dashboard"
+            style={{ padding: '0.4rem 0.75rem', fontSize: '0.85rem' }}
           >
-            <X size={16} />
+            <ArrowLeft size={16} />
+            <span>Back to Dashboard</span>
           </button>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginLeft: '0.5rem' }}>
+            <CheckCircle2 size={20} className="text-emerald-600" />
+            <h1 className="header-title" style={{ fontSize: '1.2rem' }}>
+              Completed Tasks Archive ({completedTasks.length})
+            </h1>
+          </div>
         </div>
 
-        {/* Completed Task List Sorted by Most Recent */}
-        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.45rem', paddingRight: '4px' }}>
-          {completedTasks.length === 0 ? (
-            <div className="empty-state" style={{ padding: '1.5rem' }}>
-              No completed tasks yet.
-            </div>
-          ) : (
-            completedTasks.map(task => (
+        {completedTasks.length > 0 && (
+          <button 
+            className="action-btn-sm"
+            onClick={onClearCompletedHistory}
+            style={{ color: '#ef4444', borderColor: '#fca5a5' }}
+          >
+            <Trash2 size={14} />
+            <span>Clear History</span>
+          </button>
+        )}
+      </header>
+
+      {/* Full-Screen Content Area */}
+      <main className="main-content" style={{ padding: '1.5rem 1.75rem 3rem 1.75rem' }}>
+        {completedTasks.length === 0 ? (
+          <div className="empty-state" style={{ padding: '3rem', fontSize: '0.95rem' }}>
+            No completed tasks yet. Items completed from your lists will be archived here.
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
+            {completedTasks.map(task => (
               <div 
                 key={task.id}
                 style={{
-                  background: 'var(--bg-primary)',
+                  background: 'var(--bg-secondary)',
                   border: '1px solid var(--border-color)',
-                  borderRadius: '6px',
-                  padding: '0.45rem 0.75rem',
+                  borderRadius: '8px',
+                  padding: '0.75rem 1rem',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  gap: '0.5rem'
+                  gap: '1rem',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)'
                 }}
               >
-                <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, gap: '2px' }}>
-                  {/* Task Title */}
-                  <span style={{ fontSize: '0.82rem', textDecoration: 'line-through', color: 'var(--text-muted)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, gap: '0.3rem' }}>
+                  {/* Clean Normal Text (NO Strike-Through!) */}
+                  <span style={{ fontSize: '0.92rem', fontWeight: 500, color: 'var(--text-main)' }}>
                     {task.title}
                   </span>
 
-                  {/* Origin Tag & Timestamp */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
-                    <span className="day-badge" style={{ background: '#e0e7ff', color: '#3730a3', fontSize: '0.66rem' }}>
+                  {/* Origin Tag & Friendly Timestamp */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                    <span className="day-badge" style={{ background: '#e0e7ff', color: '#3730a3', fontSize: '0.72rem', padding: '2px 8px' }}>
                       {getOriginTagLabel(task)}
                     </span>
-                    <span style={{ fontSize: '0.68rem', color: 'var(--text-dim)' }}>
-                      {formatTime(task.completedAt)}
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+                      Completed {formatTime(task.completedAt)}
                     </span>
                   </div>
                 </div>
@@ -105,31 +111,17 @@ export default function CompletedModal({
                 <button 
                   className="action-btn-sm"
                   onClick={() => onRestoreTask(task.id)}
-                  title="Restore task to active list"
-                  style={{ padding: '2px 6px', fontSize: '0.72rem', flexShrink: 0 }}
+                  title="Restore task back to active list"
+                  style={{ padding: '0.4rem 0.8rem', fontSize: '0.78rem', flexShrink: 0 }}
                 >
-                  <RotateCcw size={11} />
+                  <RotateCcw size={13} />
                   <span>Restore</span>
                 </button>
               </div>
-            ))
-          )}
-        </div>
-
-        {/* Footer Actions */}
-        {completedTasks.length > 0 && (
-          <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '0.5rem', borderTop: '1px solid var(--border-color)' }}>
-            <button 
-              className="action-btn-sm"
-              onClick={onClearCompletedHistory}
-              style={{ color: '#ef4444', borderColor: '#fca5a5' }}
-            >
-              <Trash2 size={12} />
-              <span>Clear History</span>
-            </button>
+            ))}
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }

@@ -578,6 +578,19 @@ button, input, select, textarea {
   padding: 1.5rem;
 }
 
+/* Full Screen Completed Archive Page */
+.completed-page-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  overflow-y: auto;
+}
+
 .auth-card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
