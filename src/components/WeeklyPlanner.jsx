@@ -82,7 +82,10 @@ export default function WeeklyPlanner({
       {isExpanded && (
         <div className="planner-days-grid">
           {DAYS_CONFIG.map((day) => {
-            const dayTasks = tasks.filter(t => t.scheduledDay === day.key);
+            // High Priority tasks float automatically to the top of each day's list!
+            const dayTasks = tasks
+              .filter(t => t.scheduledDay === day.key)
+              .sort((a, b) => (b.isHighPriority ? 1 : 0) - (a.isHighPriority ? 1 : 0));
             
             return (
               <div key={day.key} className="planner-day-column">

@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
-  Flame, 
   Plus, 
   Moon, 
   Sun, 
   Calendar, 
   FolderPlus, 
-  CheckCircle2,
-  RotateCcw
+  CheckCircle2
 } from 'lucide-react';
 import AuthModal from './components/AuthModal';
 import WeeklyPlanner from './components/WeeklyPlanner';
@@ -197,6 +195,7 @@ export default function App() {
     setTasks(prev => prev.filter(t => !t.isCompleted));
   };
 
+  // Priority toggle moves high priority tasks automatically to top of list
   const handleTogglePriority = (taskId) => {
     setTasks(prev => prev.map(t => {
       if (t.id === taskId) {
@@ -306,11 +305,6 @@ export default function App() {
     setTasks(prev => [...prev, ...duplicatedTasks]);
   };
 
-  // High Priority Tasks Across ALL Categories & Tabs
-  const allHighPriorityTasks = useMemo(() => {
-    return tasks.filter(t => t.isHighPriority && !t.isCompleted);
-  }, [tasks]);
-
   // Completed Tasks Sorted by Most Recently Completed (Newest First)
   const completedTasksSorted = useMemo(() => {
     return tasks
@@ -407,32 +401,7 @@ export default function App() {
       {/* Main Body Area */}
       <main className="main-content">
         {/* ========================================================================= */}
-        {/* HIGH PRIORITY QUICK GLANCE SECTION                                        */}
-        {/* ========================================================================= */}
-        {allHighPriorityTasks.length > 0 && (
-          <section className="high-priority-banner">
-            <div className="high-priority-header">
-              <Flame size={15} />
-              <span>High Priority Items ({allHighPriorityTasks.length})</span>
-            </div>
-
-            <div className="high-priority-grid">
-              {allHighPriorityTasks.map(task => (
-                <TaskCard
-                  key={`hp-${task.id}`}
-                  task={task}
-                  onToggleComplete={handleToggleComplete}
-                  onTogglePriority={handleTogglePriority}
-                  onUpdateTaskTitle={handleUpdateTaskTitle}
-                  onDeleteTask={handleDeleteTask}
-                />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* ========================================================================= */}
-        {/* WEEKLY PLANNING VIEW (7-DAY SUNDAY THROUGH SATURDAY GRID)                 */}
+        {/* WEEKLY PLANNING VIEW (7-DAY MONDAY THROUGH SUNDAY GRID)                  */}
         {/* ========================================================================= */}
         <WeeklyPlanner
           isExpanded={isPlannerExpanded}
@@ -447,7 +416,7 @@ export default function App() {
         />
 
         {/* ========================================================================= */}
-        {/* CATEGORY COLUMNS GRID (ORGANIZED TASKS BY CATEGORIES)                     */}
+        {/* CATEGORY COLUMNS GRID (HIGH PRIORITY TASKS SORTED AUTOMATICALLY TO TOP)    */}
         {/* ========================================================================= */}
         <section>
           <div className="categories-grid-header">
@@ -485,7 +454,10 @@ export default function App() {
 
           <div className="categories-container" style={{ marginTop: '0.85rem' }}>
             {currentCategories.map(cat => {
-              const catTasks = activeTabTasks.filter(t => t.categoryId === cat.id);
+              // High Priority Tasks float automatically to the top of the column!
+              const catTasks = activeTabTasks
+                .filter(t => t.categoryId === cat.id)
+                .sort((a, b) => (b.isHighPriority ? 1 : 0) - (a.isHighPriority ? 1 : 0));
               
               return (
                 <CategoryColumn
