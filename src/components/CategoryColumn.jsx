@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import TaskCard from './TaskCard';
+import CategoryIconPicker from './CategoryIconPicker';
 
 export default function CategoryColumn({
   category,
@@ -10,6 +11,7 @@ export default function CategoryColumn({
   onTogglePriority,
   onUpdateTaskTitle,
   onUpdateCategoryName,
+  onUpdateCategoryIcon,
   onDeleteTask,
   onDropTaskToCategory,
   onDeleteCategory
@@ -67,9 +69,11 @@ export default function CategoryColumn({
       {/* Category Column Header */}
       <div className="category-column-header">
         <div className="category-title-group">
-          <div 
-            className="category-color-dot" 
-            style={{ backgroundColor: category.color || '#4f46e5' }}
+          {/* Interactive Category Icon & Color Picker */}
+          <CategoryIconPicker
+            currentIcon={category.icon || 'tag'}
+            currentColor={category.color || '#4f46e5'}
+            onSelectIcon={(data) => onUpdateCategoryIcon && onUpdateCategoryIcon(category.id, data)}
           />
 
           {isEditingCatName ? (

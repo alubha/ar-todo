@@ -3,13 +3,13 @@ import { CalendarDays } from 'lucide-react';
 import TaskCard from './TaskCard';
 
 const DAYS_CONFIG = [
-  { key: 'mon', name: 'Mon' },
-  { key: 'tue', name: 'Tue' },
-  { key: 'wed', name: 'Wed' },
-  { key: 'thu', name: 'Thu' },
-  { key: 'fri', name: 'Fri' },
-  { key: 'sat', name: 'Sat' },
-  { key: 'sun', name: 'Sun' }
+  { key: 'mon', name: 'Mon', type: 'weekday' },
+  { key: 'tue', name: 'Tue', type: 'weekday' },
+  { key: 'wed', name: 'Wed', type: 'weekday' },
+  { key: 'thu', name: 'Thu', type: 'weekday' },
+  { key: 'fri', name: 'Fri', type: 'weekday' },
+  { key: 'sat', name: 'Sat', type: 'weekend' },
+  { key: 'sun', name: 'Sun', type: 'weekend' }
 ];
 
 export default function WeeklyPlanner({
@@ -61,7 +61,7 @@ export default function WeeklyPlanner({
               .sort((a, b) => (b.isHighPriority ? 1 : 0) - (a.isHighPriority ? 1 : 0));
             
             return (
-              <div key={day.key} className="planner-day-column">
+              <div key={day.key} className={`planner-day-column ${day.type}`}>
                 <div className="day-header">
                   <span className="day-name">{day.name}</span>
                 </div>

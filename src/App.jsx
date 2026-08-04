@@ -12,24 +12,24 @@ import WeeklyPlanner from './components/WeeklyPlanner';
 import CategoryColumn from './components/CategoryColumn';
 import CompletedModal from './components/CompletedModal';
 
-// Default Initial Categories per Tab
+// Default Initial Categories per Tab with Relevant Icons
 const INITIAL_CATEGORIES = {
   personal: [
-    { id: 'tech', name: 'Tech', color: '#06b6d4' },
-    { id: 'clean', name: 'Clean', color: '#10b981' },
-    { id: 'errands', name: 'Errands', color: '#f59e0b' },
-    { id: 'health', name: 'Health', color: '#ec4899' }
+    { id: 'tech', name: 'Tech', icon: 'laptop', color: '#06b6d4' },
+    { id: 'clean', name: 'Clean', icon: 'sparkles', color: '#10b981' },
+    { id: 'errands', name: 'Errands', icon: 'shopping-bag', color: '#f59e0b' },
+    { id: 'health', name: 'Health', icon: 'heart-pulse', color: '#ec4899' }
   ],
   work: [
-    { id: 'networking', name: 'Networking', color: '#8b5cf6' },
-    { id: 'scheduling', name: 'Scheduling', color: '#6366f1' },
-    { id: 'projects', name: 'Projects', color: '#3b82f6' },
-    { id: 'followups', name: 'Follow-ups', color: '#14b8a6' }
+    { id: 'networking', name: 'Networking', icon: 'users', color: '#8b5cf6' },
+    { id: 'scheduling', name: 'Scheduling', icon: 'calendar', color: '#6366f1' },
+    { id: 'projects', name: 'Projects', icon: 'folder-kanban', color: '#3b82f6' },
+    { id: 'followups', name: 'Follow-ups', icon: 'check-square', color: '#14b8a6' }
   ],
   ap: [
-    { id: 'finance', name: 'Finance & Bills', color: '#10b981' },
-    { id: 'home', name: 'Home Maintenance', color: '#f97316' },
-    { id: 'planning', name: 'Planning', color: '#a855f7' }
+    { id: 'finance', name: 'Finance & Bills', icon: 'dollar-sign', color: '#10b981' },
+    { id: 'home', name: 'Home Maintenance', icon: 'home', color: '#f97316' },
+    { id: 'planning', name: 'Planning', icon: 'compass', color: '#a855f7' }
   ]
 };
 
@@ -251,12 +251,15 @@ export default function App() {
     e.preventDefault();
     if (!newCategoryName.trim()) return;
 
-    const colors = ['#4f46e5', '#06b6d4', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#3b82f6'];
+    const colors = ['#06b6d4', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#3b82f6', '#14b8a6'];
+    const icons = ['tag', 'star', 'sparkles', 'bookmark', 'coffee', 'zap', 'target'];
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    const randomIcon = icons[Math.floor(Math.random() * icons.length)];
 
     const newCat = {
       id: `cat-${Date.now()}`,
       name: newCategoryName.trim(),
+      icon: randomIcon,
       color: randomColor
     };
 
@@ -289,20 +292,16 @@ export default function App() {
     }));
   };
 
-  // Duplicate Week Feature
-  const handleDuplicateWeek = () => {
-    const scheduledTasks = tasks.filter(t => t.scheduledDay && !t.isCompleted);
-    if (scheduledTasks.length === 0) return;
-
-    const duplicatedTasks = scheduledTasks.map(t => ({
-      ...t,
-      id: `task-dup-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-      title: `${t.title} (Copy)`,
-      isCompleted: false,
-      completedAt: null
+  const handleUpdateCategoryIcon = (catId, { icon, color }) => {
+    setCategories(prev => ({
+      ...prev,
+      [activeTab]: (prev[activeTab] || []).map(c => {
+        if (c.id === catId) {
+          return { ...c, icon: icon || c.icon, color: color || c.color };
+        }
+        return c;
+      })
     }));
-
-    setTasks(prev => [...prev, ...duplicatedTasks]);
   };
 
   // Completed Tasks Sorted by Most Recently Completed (Newest First)
@@ -412,7 +411,6 @@ export default function App() {
           onUpdateTaskTitle={handleUpdateTaskTitle}
           onDeleteTask={handleDeleteTask}
           onDropTaskToDay={handleDropTaskToDay}
-          onDuplicateWeek={handleDuplicateWeek}
         />
 
         {/* ========================================================================= */}
@@ -469,6 +467,7 @@ export default function App() {
                   onTogglePriority={handleTogglePriority}
                   onUpdateTaskTitle={handleUpdateTaskTitle}
                   onUpdateCategoryName={handleUpdateCategoryName}
+                  onUpdateCategoryIcon={handleUpdateCategoryIcon}
                   onDeleteTask={handleDeleteTask}
                   onDropTaskToCategory={handleDropTaskToCategory}
                   onDeleteCategory={handleDeleteCategory}

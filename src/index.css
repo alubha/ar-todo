@@ -297,6 +297,58 @@ button, input, select, textarea {
   width: 100%;
 }
 
+/* Weekday (Mon-Fri) Light Green Fill */
+.planner-day-column.weekday {
+  background: #f0fdf4;
+}
+
+.planner-day-column.weekday .day-header {
+  color: #166534;
+  border-bottom: 1.5px solid #bbf7d0;
+}
+
+/* Weekend (Sat-Sun) Light Blue Fill */
+.planner-day-column.weekend {
+  background: #eff6ff;
+}
+
+.planner-day-column.weekend .day-header {
+  color: #1e40af;
+  border-bottom: 1.5px solid #bfdbfe;
+}
+
+/* Dark mode overrides for weekday/weekend */
+[data-theme="dark"] .planner-day-column.weekday {
+  background: #062c19;
+}
+[data-theme="dark"] .planner-day-column.weekday .day-header {
+  color: #86efac;
+  border-bottom-color: #166534;
+}
+
+[data-theme="dark"] .planner-day-column.weekend {
+  background: #0b1f3a;
+}
+[data-theme="dark"] .planner-day-column.weekend .day-header {
+  color: #93c5fd;
+  border-bottom-color: #1e40af;
+}
+
+/* Category Icon & Color Picker Popover */
+.icon-picker-popover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 100;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  padding: 0.6rem;
+  width: 170px;
+  margin-top: 4px;
+}
+
 .day-header {
   display: flex;
   align-items: center;
