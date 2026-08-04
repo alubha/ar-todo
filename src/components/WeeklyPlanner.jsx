@@ -8,13 +8,13 @@ import {
 import TaskCard from './TaskCard';
 
 const DAYS_CONFIG = [
-  { key: 'sun', name: 'Sun' },
   { key: 'mon', name: 'Mon' },
   { key: 'tue', name: 'Tue' },
   { key: 'wed', name: 'Wed' },
   { key: 'thu', name: 'Thu' },
   { key: 'fri', name: 'Fri' },
-  { key: 'sat', name: 'Sat' }
+  { key: 'sat', name: 'Sat' },
+  { key: 'sun', name: 'Sun' }
 ];
 
 export default function WeeklyPlanner({
@@ -54,7 +54,7 @@ export default function WeeklyPlanner({
       <div className="planner-header" onClick={onToggleExpand}>
         <div className="planner-title">
           <CalendarDays size={16} className="text-indigo-600" />
-          <span>Weekly Schedule (Sun – Sat)</span>
+          <span>Weekly Schedule (Mon – Sun)</span>
         </div>
 
         <div className="planner-actions" onClick={(e) => e.stopPropagation()}>
@@ -78,7 +78,7 @@ export default function WeeklyPlanner({
         </div>
       </div>
 
-      {/* 7-Day Single Row Grid (Sun - Sat) */}
+      {/* 7-Day Single Row Grid (Mon - Sun) */}
       {isExpanded && (
         <div className="planner-days-grid">
           {DAYS_CONFIG.map((day) => {

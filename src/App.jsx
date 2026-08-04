@@ -278,6 +278,18 @@ export default function App() {
     setTasks(prev => prev.filter(t => t.categoryId !== catId));
   };
 
+  const handleUpdateCategoryName = (catId, newName) => {
+    setCategories(prev => ({
+      ...prev,
+      [activeTab]: (prev[activeTab] || []).map(c => {
+        if (c.id === catId) {
+          return { ...c, name: newName };
+        }
+        return c;
+      })
+    }));
+  };
+
   // Duplicate Week Feature
   const handleDuplicateWeek = () => {
     const scheduledTasks = tasks.filter(t => t.scheduledDay && !t.isCompleted);
@@ -484,6 +496,7 @@ export default function App() {
                   onToggleComplete={handleToggleComplete}
                   onTogglePriority={handleTogglePriority}
                   onUpdateTaskTitle={handleUpdateTaskTitle}
+                  onUpdateCategoryName={handleUpdateCategoryName}
                   onDeleteTask={handleDeleteTask}
                   onDropTaskToCategory={handleDropTaskToCategory}
                   onDeleteCategory={handleDeleteCategory}

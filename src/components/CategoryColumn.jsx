@@ -9,12 +9,15 @@ export default function CategoryColumn({
   onToggleComplete,
   onTogglePriority,
   onUpdateTaskTitle,
+  onUpdateCategoryName,
   onDeleteTask,
   onDropTaskToCategory,
   onDeleteCategory
 }) {
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [isDragOver, setIsDragOver] = useState(false);
+  const [isEditingCatName, setIsEditingCatName] = useState(false);
+  const [catName, setCatName] = useState(category.name);
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
@@ -41,6 +44,24 @@ export default function CategoryColumn({
     }
   };
 
+  const handleSaveCatName = () => {
+    if (catName.trim() && catName.trim() !== category.name) {
+      onUpdateCategoryName(category.id, catName.trim());
+    } else {
+      setCatName(category.name);
+    }
+    setIsEditingCatName(false);
+  };
+
+  const handleKeyDownCat = (e) => {
+    if (e.key === 'Enter') {
+      handleSaveCatName();
+    } else if (e.key === 'Escape') {
+      setCatName(category.name);
+      setIsEditingCatName(false);
+    }
+  };
+
   return (
     <div className="category-column">
       {/* Category Column Header */}
@@ -50,7 +71,27 @@ export default function CategoryColumn({
             className="category-color-dot" 
             style={{ backgroundColor: category.color || '#4f46e5' }}
           />
-          <h3 className="category-name">{category.name}</h3>
+
+          {isEditingCatName ? (
+            <input
+              type="text"
+              className="category-edit-input"
+              value={catName}
+              onChange={(e) => setCatName(e.target.value)}
+              onBlur={handleSaveCatName}
+              onKeyDown={handleKeyDownCat}
+              autoFocus
+            />
+          ) : (
+            <h3 
+              className="category-name" 
+              title="Click to edit category name"
+              onClick={() => setIsEditingCatName(true)}
+            >
+              {category.name}
+            </h3>
+          )}
+
           <span className="category-task-count">{tasks.length}</span>
         </div>
 
