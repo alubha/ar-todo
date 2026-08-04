@@ -272,13 +272,8 @@ export default function App() {
       {/* Navigation Header */}
       <header className="app-header">
         <div className="header-brand">
-          <div className="header-logo-badge">
-            <img src="/ar_logo.png" alt="AR Monogram Logo" />
-          </div>
-          <div className="header-title-wrap">
-            <h1>AR To Do</h1>
-            <p>Task Tracking & Planning</p>
-          </div>
+          <img src="/ar_logo.png" alt="AR Logo" className="header-logo-img" />
+          <h1 className="header-title">AR To Do</h1>
         </div>
 
         {/* 3 Main Tabs: Personal, Work, AP */}
