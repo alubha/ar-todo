@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, GripVertical } from 'lucide-react';
+import { Trash2, GripVertical } from 'lucide-react';
 import TaskCard from './TaskCard';
 import CategoryIconPicker from './CategoryIconPicker';
 
@@ -165,19 +165,16 @@ export default function CategoryColumn({
         )}
       </div>
 
-      {/* Add Task Input Form (hidden for Auto Urgent Column) */}
+      {/* Clean Add Task Input (Press Enter to save - no purple plus button) */}
       {!category.isAutoUrgent && (
         <form onSubmit={handleFormSubmit} className="add-task-form">
           <input
             type="text"
             className="add-task-input"
-            placeholder="+ Add task..."
+            placeholder="+ Add task (press Enter)..."
             value={newTaskTitle}
             onChange={(e) => setNewTaskTitle(e.target.value)}
           />
-          <button type="submit" className="add-task-btn" title="Add Task">
-            <Plus size={14} />
-          </button>
         </form>
       )}
     </div>

@@ -808,20 +808,17 @@ export default function App() {
               </button>
             </div>
 
-            {/* New Category Inline Form */}
+            {/* New Category Inline Form (Press Enter to save - no purple plus button) */}
             {showNewCatInput && (
               <form onSubmit={handleAddCategory} className="add-task-form" style={{ marginTop: '0.65rem', maxWidth: '320px' }}>
                 <input
                   type="text"
                   className="add-task-input"
-                  placeholder="Category name..."
+                  placeholder="Category name (press Enter)..."
                   value={newCategoryName}
                   onChange={(e) => setNewCategoryName(e.target.value)}
                   autoFocus
                 />
-                <button type="submit" className="add-task-btn">
-                  <Plus size={14} />
-                </button>
               </form>
             )}
 

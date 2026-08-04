@@ -195,10 +195,10 @@ button, input, select, textarea {
   border-color: var(--accent-primary);
 }
 
-/* Main Layout */
+/* Main Layout - Full Width Space Utilization */
 .main-content {
   flex: 1;
-  max-width: 1600px;
+  max-width: 100%;
   width: 100%;
   margin: 0 auto;
   padding: 1rem 1.25rem 2.5rem 1.25rem;
@@ -379,9 +379,9 @@ button, input, select, textarea {
   font-weight: 700;
 }
 
-/* Compact Masonry Multi-Column Container (Eliminates vertical whitespace gaps!) */
+/* Full Width Masonry Multi-Column Container (Spans full screen width to fit extra right columns!) */
 .categories-container {
-  column-width: 270px;
+  column-width: 250px;
   column-gap: 0.85rem;
   width: 100%;
 }
@@ -571,7 +571,7 @@ button, input, select, textarea {
   background: rgba(16, 185, 129, 0.1);
 }
 
-/* Add Task Input Form */
+/* Clean Add Task Input Form */
 .add-task-form {
   display: flex;
   gap: 0.35rem;
@@ -591,18 +591,6 @@ button, input, select, textarea {
 
 .add-task-input:focus {
   border-color: var(--accent-primary);
-}
-
-.add-task-btn {
-  background: var(--accent-primary);
-  border: none;
-  color: #fff;
-  border-radius: var(--radius-sm);
-  padding: 0 0.55rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
 }
 
 /* Empty State */
