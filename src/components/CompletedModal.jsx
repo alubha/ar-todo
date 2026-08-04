@@ -65,7 +65,7 @@ export default function CompletedModal({
                   padding: '0.45rem 0.75rem',
                   display: 'flex',
                   alignItems: 'center',
-                  justify-content: 'space-between',
+                  justifyContent: 'space-between',
                   gap: '0.5rem'
                 }}
               >
