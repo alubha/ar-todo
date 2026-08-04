@@ -708,14 +708,14 @@ button, input, select, textarea {
   box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
 }
 
-/* PASSCODE AUTHENTICATION MODAL */
+/* PASSCODE AUTHENTICATION MODAL (MINIMALIST LOCK SCREEN) */
 .auth-overlay {
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: rgba(11, 15, 25, 0.88);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(11, 15, 25, 0.95);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -725,82 +725,14 @@ button, input, select, textarea {
 .auth-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: 2.5rem 2rem;
-  max-width: 400px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
+  border-radius: 16px;
   box-shadow: var(--shadow-lg);
-  text-align: center;
-}
-
-.auth-calendar-logo-frame {
-  width: 90px;
-  height: 90px;
-  border-radius: 20px;
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border: 2px solid var(--border-highlight);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  box-shadow: var(--shadow-glow);
-}
-
-.auth-calendar-logo-frame::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 14px;
-  background: var(--accent-gradient);
-  border-top-left-radius: 18px;
-  border-top-right-radius: 18px;
-}
-
-.auth-logo-img {
-  width: 48px;
-  height: 48px;
-  object-fit: contain;
-  margin-top: 8px;
-}
-
-.auth-title-group h2 {
-  font-family: var(--font-heading);
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-}
-
-.auth-title-group p {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin-top: 0.3rem;
-}
-
-.auth-input-group {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
 }
 
 .auth-input {
-  width: 100%;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1.5px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 0.85rem 1rem;
-  font-size: 1rem;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid var(--border-color);
   color: var(--text-main);
-  text-align: center;
-  letter-spacing: 0.25em;
-  outline: none;
   transition: var(--transition-fast);
 }
 
@@ -810,26 +742,17 @@ button, input, select, textarea {
 
 .auth-input:focus {
   border-color: var(--accent-primary);
-  box-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.25);
 }
 
 .auth-submit-btn {
-  width: 100%;
   background: var(--accent-gradient);
-  color: #fff;
   border: none;
-  border-radius: var(--radius-md);
-  padding: 0.85rem;
-  font-weight: 700;
-  font-size: 0.95rem;
-  cursor: pointer;
   transition: var(--transition-fast);
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
 }
 
 .auth-submit-btn:hover {
   opacity: 0.92;
-  transform: translateY(-1px);
 }
 
 .auth-error-msg {

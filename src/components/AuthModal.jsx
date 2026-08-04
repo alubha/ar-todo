@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, ShieldCheck, KeyRound } from 'lucide-react';
-import { verifyPasscode } from '../utils/cryptoUtils';
+import { hashPasscode, PASSCODE_HASH } from '../utils/cryptoUtils';
 
 export default function AuthModal({ onAuthenticate }) {
   const [passcode, setPasscode] = useState('');
@@ -9,20 +8,24 @@ export default function AuthModal({ onAuthenticate }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!passcode) return;
+    const cleanPass = passcode.trim();
+    if (!cleanPass) return;
     
     setIsSubmitting(true);
     setErrorMsg('');
     
     try {
-      const isValid = await verifyPasscode(passcode);
-      if (isValid) {
+      const lowerPass = cleanPass.toLowerCase();
+      const inputHash = await hashPasscode(cleanPass);
+      
+      // Accepts 'ar786' (case-insensitive & trimmed) OR SHA-256 hash match
+      if (lowerPass === 'ar786' || inputHash === PASSCODE_HASH) {
         onAuthenticate();
       } else {
-        setErrorMsg('Incorrect passcode. Please try again.');
+        setErrorMsg('Incorrect passcode');
       }
     } catch (err) {
-      setErrorMsg('Authentication error. Try again.');
+      setErrorMsg('Error verifying passcode');
     } finally {
       setIsSubmitting(false);
     }
@@ -30,41 +33,82 @@ export default function AuthModal({ onAuthenticate }) {
 
   return (
     <div className="auth-overlay">
-      <div className="auth-card">
-        {/* Calendar Box Monogram Logo Frame */}
-        <div className="auth-calendar-logo-frame">
+      <div 
+        className="auth-card"
+        style={{
+          maxWidth: '320px',
+          width: '88%',
+          borderRadius: '16px',
+          padding: '2.5rem 1.8rem 2rem',
+          margin: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center'
+        }}
+      >
+        {/* Direct AR Monogram Logo (No Calendar Frame) */}
+        <div style={{ marginBottom: '1.75rem', display: 'flex', justifyContent: 'center' }}>
           <img 
             src="/ar_logo.png" 
-            alt="AR Monogram Logo" 
-            className="auth-logo-img"
+            alt="AR Logo" 
+            style={{ 
+              height: '48px', 
+              width: 'auto',
+              display: 'block',
+              objectFit: 'contain'
+            }} 
           />
         </div>
 
-        <div className="auth-title-group">
-          <h2>AR To Do</h2>
-          <p>Secure Task Management & Weekly Planner</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="auth-input-group">
+        {/* Clean, Simple Form with Two Equal Empty Boxes (Matching AR Schedule) */}
+        <form onSubmit={handleSubmit} style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+          {/* Empty Password Input Box */}
           <input
             type="password"
             className="auth-input"
-            placeholder="••••••••"
             value={passcode}
-            onChange={(e) => setPasscode(e.target.value)}
+            onChange={(e) => {
+              setPasscode(e.target.value);
+              if (errorMsg) setErrorMsg('');
+            }}
             autoFocus
             required
+            style={{
+              width: '100%',
+              height: '44px',
+              boxSizing: 'border-box',
+              fontSize: '0.95rem',
+              padding: '0 1rem',
+              borderRadius: '10px',
+              textAlign: 'center',
+              outline: 'none'
+            }}
           />
 
-          {errorMsg && <div className="auth-error-msg">{errorMsg}</div>}
-
+          {/* Empty Submit Button Box */}
           <button 
             type="submit" 
             className="auth-submit-btn"
             disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Authenticating...' : 'Unlock Workspace'}
-          </button>
+            aria-label="Submit Password"
+            style={{
+              width: '100%',
+              height: '44px',
+              boxSizing: 'border-box',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 0
+            }}
+          />
+
+          {errorMsg && (
+            <div style={{ color: '#ef4444', fontSize: '0.76rem', textAlign: 'center', marginTop: '0.25rem' }}>
+              {errorMsg}
+            </div>
+          )}
         </form>
       </div>
     </div>
