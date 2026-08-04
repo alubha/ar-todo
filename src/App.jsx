@@ -6,7 +6,8 @@ import {
   Calendar, 
   FolderPlus, 
   CheckCircle2,
-  Settings
+  Settings,
+  Lock
 } from 'lucide-react';
 import AuthModal from './components/AuthModal';
 import WeeklyPlanner from './components/WeeklyPlanner';
@@ -185,6 +186,11 @@ export default function App() {
   const handleAuthenticate = () => {
     setIsAuthenticated(true);
     sessionStorage.setItem('artodo_authenticated', 'true');
+  };
+
+  const handleLockApp = () => {
+    sessionStorage.removeItem('artodo_authenticated');
+    setIsAuthenticated(false);
   };
 
   const toggleTheme = () => {
@@ -488,7 +494,7 @@ export default function App() {
           <h1 className="header-title">AR To Do</h1>
         </div>
 
-        {/* Clean Top-Level Tabs (No X buttons!) */}
+        {/* Clean Top-Level Tabs */}
         <nav className="header-tabs" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
           {tabs.map(tab => (
             <button 
@@ -526,6 +532,7 @@ export default function App() {
             <span>Archive ({completedTasksSorted.length + archivedCategories.length + archivedTabs.length})</span>
           </button>
 
+          {/* Calendar View Toggle */}
           <button 
             className={`icon-btn ${isPlannerExpanded ? 'active-planner' : ''}`}
             onClick={() => setIsPlannerExpanded(prev => !prev)}
@@ -534,12 +541,31 @@ export default function App() {
             <Calendar size={15} />
           </button>
 
+          {/* Tab Settings Gear Icon (Right next to Calendar icon) */}
+          <button
+            className="icon-btn"
+            onClick={() => setIsTabSettingsOpen(true)}
+            title={`Tab Settings ("${currentTabObj?.name}")`}
+          >
+            <Settings size={15} />
+          </button>
+
+          {/* Theme Toggle Button */}
           <button 
             className="icon-btn" 
             onClick={toggleTheme}
             title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
           >
             {theme === 'light' ? <Moon size={15} /> : <Sun size={15} />}
+          </button>
+
+          {/* Padlock Lock Button */}
+          <button
+            className="icon-btn"
+            onClick={handleLockApp}
+            title="Lock Application"
+          >
+            <Lock size={15} />
           </button>
         </div>
       </header>
@@ -561,25 +587,13 @@ export default function App() {
         />
 
         {/* ========================================================================= */}
-        {/* CATEGORY COLUMNS GRID (TAB SETTINGS GEAR & CATEGORY MANAGEMENT)           */}
+        {/* CATEGORY COLUMNS GRID                                                     */}
         {/* ========================================================================= */}
         <section>
           <div className="categories-grid-header">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <h2 className="section-title">
-                {currentTabObj?.name} Categories
-              </h2>
-
-              {/* Tab Settings Gear Icon */}
-              <button
-                className="task-action-btn"
-                onClick={() => setIsTabSettingsOpen(true)}
-                title={`Configure Tab "${currentTabObj?.name}"`}
-                style={{ padding: '3px 5px' }}
-              >
-                <Settings size={15} />
-              </button>
-            </div>
+            <h2 className="section-title">
+              {currentTabObj?.name} Categories
+            </h2>
 
             <button 
               className="action-btn-sm"
