@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Flame, Check } from 'lucide-react';
+import { Flame, Check, X } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export default function TaskCard({ 
@@ -7,6 +7,7 @@ export default function TaskCard({
   onToggleComplete, 
   onTogglePriority, 
   onUpdateTaskTitle,
+  onUnscheduleTask,
   onDragStart
 }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -25,6 +26,13 @@ export default function TaskCard({
   const handlePriorityToggle = (e) => {
     e.stopPropagation();
     onTogglePriority(task.id);
+  };
+
+  const handleUnschedule = (e) => {
+    e.stopPropagation();
+    if (onUnscheduleTask) {
+      onUnscheduleTask(task.id);
+    }
   };
 
   const handleSaveEdit = () => {
@@ -79,9 +87,9 @@ export default function TaskCard({
         )}
       </div>
 
-      {/* 2 Right Action Options: Fire (🔥) & Checkmark (✓) */}
+      {/* Task Action Buttons */}
       <div className="task-actions">
-        {/* Option 1: Fire Toggle (High Priority) */}
+        {/* Fire Toggle (High Priority) */}
         <button 
           className={`task-action-btn priority-toggle ${task.isHighPriority ? 'active' : ''}`}
           onClick={handlePriorityToggle}
@@ -90,7 +98,7 @@ export default function TaskCard({
           <Flame size={14} />
         </button>
 
-        {/* Option 2: Checkmark (Complete Task) */}
+        {/* Checkmark (Complete Task) */}
         <button 
           className="task-action-btn check-action-btn"
           onClick={handleComplete}
@@ -98,6 +106,18 @@ export default function TaskCard({
         >
           <Check size={14} />
         </button>
+
+        {/* Remove from Schedule (Only rendered in Weekly Planner) */}
+        {onUnscheduleTask && (
+          <button 
+            className="task-action-btn"
+            onClick={handleUnschedule}
+            title="Remove from weekly schedule (keeps task in category)"
+            style={{ color: 'var(--text-dim)' }}
+          >
+            <X size={13} />
+          </button>
+        )}
       </div>
     </div>
   );

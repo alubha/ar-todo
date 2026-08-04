@@ -19,6 +19,7 @@ export default function WeeklyPlanner({
   onToggleComplete,
   onTogglePriority,
   onUpdateTaskTitle,
+  onUnscheduleTask,
   onDeleteTask,
   onDropTaskToDay
 }) {
@@ -84,6 +85,7 @@ export default function WeeklyPlanner({
                         onToggleComplete={onToggleComplete}
                         onTogglePriority={onTogglePriority}
                         onUpdateTaskTitle={onUpdateTaskTitle}
+                        onUnscheduleTask={onUnscheduleTask}
                         onDeleteTask={onDeleteTask}
                       />
                     ))

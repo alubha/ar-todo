@@ -7,7 +7,9 @@ import {
   FolderPlus, 
   CheckCircle2,
   Settings,
-  Lock
+  Lock,
+  Search,
+  X
 } from 'lucide-react';
 import AuthModal from './components/AuthModal';
 import WeeklyPlanner from './components/WeeklyPlanner';
@@ -15,6 +17,7 @@ import CategoryColumn from './components/CategoryColumn';
 import CompletedModal from './components/CompletedModal';
 import TabSettingsModal from './components/TabSettingsModal';
 import NewTabModal from './components/NewTabModal';
+import SearchResultsView from './components/SearchResultsView';
 
 // Default Initial Tabs
 const DEFAULT_TABS = [
@@ -47,10 +50,7 @@ const INITIAL_CATEGORIES = {
 
 // Initial Tasks Loaded from "Al-Rahim To Do.pdf"
 const INITIAL_TASKS = [
-  // =========================================================================
-  // PERSONAL TAB (Al-Rahim section)
-  // =========================================================================
-  // Tasks Category
+  // PERSONAL TAB
   { id: 'pdf-p1', title: 'Install Toyota Bulb', tabId: 'personal', categoryId: 'tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-p2', title: 'Vitamins', tabId: 'personal', categoryId: 'tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-p3', title: 'Technogym exercises', tabId: 'personal', categoryId: 'tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
@@ -68,7 +68,6 @@ const INITIAL_TASKS = [
   { id: 'pdf-p15', title: 'Barnes & Noble GC', tabId: 'personal', categoryId: 'tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-p16', title: 'Steelcase Chair Repair', tabId: 'personal', categoryId: 'tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
 
-  // Computer Category
   { id: 'pdf-pc1', title: 'Duplicate HD Copy', tabId: 'personal', categoryId: 'computer', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-pc2', title: 'Clean out other G Computers', tabId: 'personal', categoryId: 'computer', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-pc3', title: 'EOY Paychecks to HD', tabId: 'personal', categoryId: 'computer', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
@@ -85,13 +84,11 @@ const INITIAL_TASKS = [
   { id: 'pdf-pc14', title: 'HSA receipts / scans to GP', tabId: 'personal', categoryId: 'computer', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-pc15', title: 'Cell phone charge & update', tabId: 'personal', categoryId: 'computer', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
 
-  // Meetings Category
   { id: 'pdf-pm1', title: 'Asif Makhani', tabId: 'personal', categoryId: 'meetings', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-pm2', title: 'Farida Hemani', tabId: 'personal', categoryId: 'meetings', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-pm3', title: 'Nick & Rachel', tabId: 'personal', categoryId: 'meetings', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-pm4', title: 'Zoheb MWWP', tabId: 'personal', categoryId: 'meetings', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
 
-  // Amin Category
   { id: 'pdf-pa1', title: 'Geico Glass Update', tabId: 'personal', categoryId: 'amin', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-pa2', title: 'DSND IRS Penalty', tabId: 'personal', categoryId: 'amin', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-pa3', title: 'DSND IRS Trackers (interest)', tabId: 'personal', categoryId: 'amin', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
@@ -99,11 +96,9 @@ const INITIAL_TASKS = [
   { id: 'pdf-pa5', title: 'Vegas', tabId: 'personal', categoryId: 'amin', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-pa6', title: 'Vancouver / Toronto', tabId: 'personal', categoryId: 'amin', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
 
-  // Swap Category
   { id: 'pdf-ps1', title: 'Banana Republic White Linen', tabId: 'personal', categoryId: 'swap', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-ps2', title: 'Target Pants Order', tabId: 'personal', categoryId: 'swap', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
 
-  // Tracking Category
   { id: 'pdf-pt1', title: 'Contact Solution', tabId: 'personal', categoryId: 'tracking', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-pt2', title: 'WG Ear Wax Removal', tabId: 'personal', categoryId: 'tracking', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-pt3', title: 'Vitamins', tabId: 'personal', categoryId: 'tracking', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
@@ -111,17 +106,13 @@ const INITIAL_TASKS = [
   { id: 'pdf-pt5', title: 'Costco Protein', tabId: 'personal', categoryId: 'tracking', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-pt6', title: 'Target Face Wash', tabId: 'personal', categoryId: 'tracking', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
 
-  // FB Marketplace Category
   { id: 'pdf-pfb1', title: 'J Crew Clothes (new)', tabId: 'personal', categoryId: 'fbmarketplace', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-pfb2', title: 'Brooks Brothers Clothes (new)', tabId: 'personal', categoryId: 'fbmarketplace', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-pfb3', title: 'Goodmanbrand Clothes (new)', tabId: 'personal', categoryId: 'fbmarketplace', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-pfb4', title: 'Alyna Chair', tabId: 'personal', categoryId: 'fbmarketplace', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-pfb5', title: 'Tech Stuff', tabId: 'personal', categoryId: 'fbmarketplace', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
 
-  // =========================================================================
-  // AP TAB (Amreen section)
-  // =========================================================================
-  // Tasks Category
+  // AP TAB
   { id: 'pdf-ap1', title: 'Snap Clean', tabId: 'ap', categoryId: 'ap-tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-ap2', title: 'Whatsapp Groups Clean', tabId: 'ap', categoryId: 'ap-tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-ap3', title: 'Instagram Saved', tabId: 'ap', categoryId: 'ap-tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
@@ -129,14 +120,12 @@ const INITIAL_TASKS = [
   { id: 'pdf-ap5', title: 'Macrame', tabId: 'ap', categoryId: 'ap-tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-ap6', title: 'ICH Painting', tabId: 'ap', categoryId: 'ap-tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
 
-  // Conversations Category
   { id: 'pdf-ac1', title: 'TPBTL', tabId: 'ap', categoryId: 'ap-conversations', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-ac2', title: 'Past', tabId: 'ap', categoryId: 'ap-conversations', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-ac3', title: 'MCO Stock from MS to Fidelity', tabId: 'ap', categoryId: 'ap-conversations', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-ac4', title: 'Email Reviews', tabId: 'ap', categoryId: 'ap-conversations', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-ac5', title: 'Paper filer', tabId: 'ap', categoryId: 'ap-conversations', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
 
-  // Room Clean Category
   { id: 'pdf-ar1', title: 'Suitcases', tabId: 'ap', categoryId: 'ap-roomclean', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-ar2', title: 'Corovan Boxes', tabId: 'ap', categoryId: 'ap-roomclean', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-ar3', title: 'Vita Health', tabId: 'ap', categoryId: 'ap-roomclean', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
@@ -145,10 +134,7 @@ const INITIAL_TASKS = [
   { id: 'pdf-ar6', title: 'Under Bed', tabId: 'ap', categoryId: 'ap-roomclean', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-ar7', title: 'White Cabinet', tabId: 'ap', categoryId: 'ap-roomclean', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
 
-  // =========================================================================
-  // WORK TAB (Google section)
-  // =========================================================================
-  // Google Core Category
+  // WORK TAB
   { id: 'pdf-w1', title: 'Portfolio', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-w2', title: 'Resume', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-w3', title: 'Team Perf/GRAD artifacts', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
@@ -174,7 +160,6 @@ const INITIAL_TASKS = [
   { id: 'pdf-w23', title: 'Betterup Manager Coaching', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-w24', title: 'Mgr Dev Series: Foundations', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
 
-  // GRAD & Projects Category
   { id: 'pdf-wg1', title: 'Home', tabId: 'work', categoryId: 'work-grad', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-wg2', title: 'UI Library', tabId: 'work', categoryId: 'work-grad', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
   { id: 'pdf-wg3', title: 'LisApps', tabId: 'work', categoryId: 'work-grad', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
@@ -206,7 +191,10 @@ export default function App() {
   // Active Tab State
   const [activeTab, setActiveTab] = useState(() => tabs[0]?.id || 'personal');
 
-  // Theme State: 'light' (default) | 'dark'
+  // Search Query State (Global Search Across All Tabs)
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Theme State
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('artodo_theme') || 'light';
   });
@@ -221,13 +209,13 @@ export default function App() {
   const [isNewTabModalOpen, setIsNewTabModalOpen] = useState(false);
   const [isTabSettingsOpen, setIsTabSettingsOpen] = useState(false);
 
-  // Categories State loaded from PDF
+  // Categories State
   const [categories, setCategories] = useState(() => {
     const saved = localStorage.getItem('artodo_categories_v3');
     return saved ? JSON.parse(saved) : INITIAL_CATEGORIES;
   });
 
-  // Tasks State loaded from PDF
+  // Tasks State
   const [tasks, setTasks] = useState(() => {
     const saved = localStorage.getItem('artodo_tasks_v3');
     return saved ? JSON.parse(saved) : INITIAL_TASKS;
@@ -288,17 +276,6 @@ export default function App() {
 
   const toggleTheme = () => {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
-  };
-
-  // Reset to PDF Data
-  const handleResetToPdfData = () => {
-    setCategories(INITIAL_CATEGORIES);
-    setTasks(INITIAL_TASKS);
-    setTabs(DEFAULT_TABS);
-    setActiveTab('personal');
-    localStorage.setItem('artodo_categories_v3', JSON.stringify(INITIAL_CATEGORIES));
-    localStorage.setItem('artodo_tasks_v3', JSON.stringify(INITIAL_TASKS));
-    localStorage.setItem('artodo_tabs_v3', JSON.stringify(DEFAULT_TABS));
   };
 
   // Top Level Tab Handlers
@@ -431,6 +408,15 @@ export default function App() {
     }));
   };
 
+  const handleUnscheduleTask = (taskId) => {
+    setTasks(prev => prev.map(t => {
+      if (t.id === taskId) {
+        return { ...t, scheduledDay: null };
+      }
+      return t;
+    }));
+  };
+
   const handleDeleteTask = (taskId) => {
     setTasks(prev => prev.filter(t => t.id !== taskId));
   };
@@ -441,7 +427,8 @@ export default function App() {
         return {
           ...t,
           categoryId: targetCategoryId,
-          tabId: activeTab
+          tabId: activeTab,
+          scheduledDay: null
         };
       }
       return t;
@@ -549,6 +536,12 @@ export default function App() {
     }));
   };
 
+  // Select Tab From Search Result Location Badge
+  const handleSelectTabFromSearch = (tabId) => {
+    setActiveTab(tabId);
+    setSearchQuery('');
+  };
+
   // Active Tab Object
   const currentTabObj = useMemo(() => {
     return tabs.find(t => t.id === activeTab) || tabs[0];
@@ -560,6 +553,13 @@ export default function App() {
       .filter(t => t.isCompleted)
       .sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0));
   }, [tasks]);
+
+  // Global Search Filter (Across ALL Tabs)
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const query = searchQuery.toLowerCase().trim();
+    return tasks.filter(t => !t.isCompleted && t.title.toLowerCase().includes(query));
+  }, [tasks, searchQuery]);
 
   // Current Tab Categories & Tasks
   const currentCategories = useMemo(() => {
@@ -603,7 +603,10 @@ export default function App() {
             <button 
               key={tab.id}
               className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => {
+                setActiveTab(tab.id);
+                setSearchQuery('');
+              }}
             >
               <span>{tab.name}</span>
               <span className="tab-count-badge">
@@ -622,6 +625,45 @@ export default function App() {
             <Plus size={14} />
           </button>
         </nav>
+
+        {/* Header Search Input */}
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', margin: '0 0.5rem', flex: '0 1 240px' }}>
+          <Search size={14} style={{ position: 'absolute', left: '10px', color: 'var(--text-dim)' }} />
+          <input
+            type="text"
+            className="add-task-input"
+            placeholder="Search all tabs..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ 
+              paddingLeft: '30px', 
+              paddingRight: searchQuery ? '28px' : '10px', 
+              height: '32px', 
+              fontSize: '0.78rem',
+              width: '100%',
+              borderRadius: '20px'
+            }}
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              style={{
+                position: 'absolute',
+                right: '8px',
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-dim)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                padding: '2px'
+              }}
+              title="Clear search"
+            >
+              <X size={13} />
+            </button>
+          )}
+        </div>
 
         {/* Header Actions */}
         <div className="header-controls">
@@ -685,84 +727,99 @@ export default function App() {
           onToggleComplete={handleToggleComplete}
           onTogglePriority={handleTogglePriority}
           onUpdateTaskTitle={handleUpdateTaskTitle}
+          onUnscheduleTask={handleUnscheduleTask}
           onDeleteTask={handleDeleteTask}
           onDropTaskToDay={handleDropTaskToDay}
         />
 
         {/* ========================================================================= */}
-        {/* CATEGORY COLUMNS GRID                                                     */}
+        {/* CATEGORY COLUMNS GRID OR GLOBAL SEARCH RESULTS VIEW                       */}
         {/* ========================================================================= */}
-        <section>
-          <div className="categories-grid-header">
-            <h2 className="section-title">
-              {currentTabObj?.name} Categories
-            </h2>
+        {searchQuery.trim() ? (
+          <SearchResultsView
+            searchQuery={searchQuery}
+            results={searchResults}
+            tabs={tabs}
+            categories={categories}
+            onToggleComplete={handleToggleComplete}
+            onTogglePriority={handleTogglePriority}
+            onUpdateTaskTitle={handleUpdateTaskTitle}
+            onDeleteTask={handleDeleteTask}
+            onSelectTab={handleSelectTabFromSearch}
+          />
+        ) : (
+          <section>
+            <div className="categories-grid-header">
+              <h2 className="section-title">
+                {currentTabObj?.name} Categories
+              </h2>
 
-            <button 
-              className="action-btn-sm"
-              onClick={() => setShowNewCatInput(prev => !prev)}
-            >
-              <FolderPlus size={13} />
-              <span>Add Category</span>
-            </button>
-          </div>
-
-          {/* New Category Inline Form */}
-          {showNewCatInput && (
-            <form onSubmit={handleAddCategory} className="add-task-form" style={{ marginTop: '0.65rem', maxWidth: '320px' }}>
-              <input
-                type="text"
-                className="add-task-input"
-                placeholder="Category name..."
-                value={newCategoryName}
-                onChange={(e) => setNewCategoryName(e.target.value)}
-                autoFocus
-              />
-              <button type="submit" className="add-task-btn">
-                <Plus size={14} />
+              <button 
+                className="action-btn-sm"
+                onClick={() => setShowNewCatInput(prev => !prev)}
+              >
+                <FolderPlus size={13} />
+                <span>Add Category</span>
               </button>
-            </form>
-          )}
+            </div>
 
-          <div className="categories-container" style={{ marginTop: '0.85rem' }}>
-            {/* Left-most Urgent Column (Appears automatically when at least 1 fire task exists!) */}
-            {urgentTabTasks.length > 0 && (
-              <CategoryColumn
-                key="urgent-auto-col"
-                category={autoUrgentCategory}
-                tasks={urgentTabTasks}
-                onToggleComplete={handleToggleComplete}
-                onTogglePriority={handleTogglePriority}
-                onUpdateTaskTitle={handleUpdateTaskTitle}
-                onDeleteTask={handleDeleteTask}
-              />
+            {/* New Category Inline Form */}
+            {showNewCatInput && (
+              <form onSubmit={handleAddCategory} className="add-task-form" style={{ marginTop: '0.65rem', maxWidth: '320px' }}>
+                <input
+                  type="text"
+                  className="add-task-input"
+                  placeholder="Category name..."
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  autoFocus
+                />
+                <button type="submit" className="add-task-btn">
+                  <Plus size={14} />
+                </button>
+              </form>
             )}
 
-            {currentCategories.map(cat => {
-              // High Priority Tasks float automatically to the top of the column!
-              const catTasks = activeTabTasks
-                .filter(t => t.categoryId === cat.id)
-                .sort((a, b) => (b.isHighPriority ? 1 : 0) - (a.isHighPriority ? 1 : 0));
-              
-              return (
+            <div className="categories-container" style={{ marginTop: '0.85rem' }}>
+              {/* Left-most Urgent Column */}
+              {urgentTabTasks.length > 0 && (
                 <CategoryColumn
-                  key={cat.id}
-                  category={cat}
-                  tasks={catTasks}
-                  onAddTask={handleAddTask}
+                  key="urgent-auto-col"
+                  category={autoUrgentCategory}
+                  tasks={urgentTabTasks}
                   onToggleComplete={handleToggleComplete}
                   onTogglePriority={handleTogglePriority}
                   onUpdateTaskTitle={handleUpdateTaskTitle}
-                  onUpdateCategoryName={handleUpdateCategoryName}
-                  onUpdateCategoryIcon={handleUpdateCategoryIcon}
                   onDeleteTask={handleDeleteTask}
                   onDropTaskToCategory={handleDropTaskToCategory}
-                  onDeleteCategory={handleDeleteCategory}
                 />
-              );
-            })}
-          </div>
-        </section>
+              )}
+
+              {currentCategories.map(cat => {
+                const catTasks = activeTabTasks
+                  .filter(t => t.categoryId === cat.id)
+                  .sort((a, b) => (b.isHighPriority ? 1 : 0) - (a.isHighPriority ? 1 : 0));
+                
+                return (
+                  <CategoryColumn
+                    key={cat.id}
+                    category={cat}
+                    tasks={catTasks}
+                    onAddTask={handleAddTask}
+                    onToggleComplete={handleToggleComplete}
+                    onTogglePriority={handleTogglePriority}
+                    onUpdateTaskTitle={handleUpdateTaskTitle}
+                    onUpdateCategoryName={handleUpdateCategoryName}
+                    onUpdateCategoryIcon={handleUpdateCategoryIcon}
+                    onDeleteTask={handleDeleteTask}
+                    onDropTaskToCategory={handleDropTaskToCategory}
+                    onDeleteCategory={handleDeleteCategory}
+                  />
+                );
+              })}
+            </div>
+          </section>
+        )}
       </main>
 
       {/* New Tab Modal */}
@@ -772,7 +829,7 @@ export default function App() {
         onCreateTab={handleCreateTab}
       />
 
-      {/* Tab Settings Modal (Rename & Delete Tab) */}
+      {/* Tab Settings Modal */}
       <TabSettingsModal
         isOpen={isTabSettingsOpen}
         onClose={() => setIsTabSettingsOpen(false)}
