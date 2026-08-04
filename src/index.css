@@ -279,15 +279,11 @@ button, input, select, textarea {
 
 .planner-days-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(7, 1fr);
   gap: 1px;
   background: var(--border-color);
-}
-
-@media (max-width: 900px) {
-  .planner-days-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .planner-day-column {

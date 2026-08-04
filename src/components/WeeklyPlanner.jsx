@@ -3,19 +3,18 @@ import {
   CalendarDays, 
   ChevronDown, 
   ChevronUp, 
-  Copy, 
-  Sparkles,
-  Plus
+  Copy 
 } from 'lucide-react';
 import TaskCard from './TaskCard';
 
 const DAYS_CONFIG = [
-  { key: 'mon', name: 'Monday' },
-  { key: 'tue', name: 'Tuesday' },
-  { key: 'wed', name: 'Wednesday' },
-  { key: 'thu', name: 'Thursday' },
-  { key: 'fri', name: 'Friday' },
-  { key: 'sat', name: 'Saturday' }
+  { key: 'sun', name: 'Sun' },
+  { key: 'mon', name: 'Mon' },
+  { key: 'tue', name: 'Tue' },
+  { key: 'wed', name: 'Wed' },
+  { key: 'thu', name: 'Thu' },
+  { key: 'fri', name: 'Fri' },
+  { key: 'sat', name: 'Sat' }
 ];
 
 export default function WeeklyPlanner({
@@ -52,37 +51,33 @@ export default function WeeklyPlanner({
     <div className="weekly-planner-container">
       {/* Planner Collapsible Header */}
       <div className="planner-header" onClick={onToggleExpand}>
-        <div className="planner-header-left">
-          <CalendarDays size={18} className="text-indigo-400" />
-          <div>
-            <h2 className="planner-title">Weekly Schedule & Planning</h2>
-            <p className="planner-subtitle">Monday – Saturday Timeline • Drag tasks to schedule your week</p>
-          </div>
+        <div className="planner-title">
+          <CalendarDays size={16} className="text-indigo-600" />
+          <span>Weekly Schedule (Sun – Sat)</span>
         </div>
 
         <div className="planner-actions" onClick={(e) => e.stopPropagation()}>
-          {/* Duplicate Week Plan Button */}
           <button 
             className="action-btn-sm"
             onClick={onDuplicateWeek}
-            title="Duplicate previous week's scheduled task plan into new week"
+            title="Duplicate scheduled week template"
           >
-            <Copy size={13} />
+            <Copy size={12} />
             <span>Duplicate Week</span>
           </button>
 
-          {/* Expand/Collapse Chevron */}
           <button 
             className="icon-btn" 
             onClick={onToggleExpand}
-            title={isExpanded ? "Collapse Weekly Planning View" : "Expand Weekly Planning View"}
+            title={isExpanded ? "Collapse View" : "Expand View"}
+            style={{ width: '28px', height: '28px' }}
           >
-            {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
           </button>
         </div>
       </div>
 
-      {/* 6-Day Monday through Saturday Grid */}
+      {/* 7-Day Single Row Grid (Sun - Sat) */}
       {isExpanded && (
         <div className="planner-days-grid">
           {DAYS_CONFIG.map((day) => {
@@ -92,7 +87,7 @@ export default function WeeklyPlanner({
               <div key={day.key} className="planner-day-column">
                 <div className="day-header">
                   <span className="day-name">{day.name}</span>
-                  <span className="day-count">{dayTasks.length} tasks</span>
+                  <span className="day-count">{dayTasks.length}</span>
                 </div>
 
                 <div 
@@ -103,7 +98,7 @@ export default function WeeklyPlanner({
                 >
                   {dayTasks.length === 0 ? (
                     <div className="empty-state">
-                      Drag task here
+                      Drag here
                     </div>
                   ) : (
                     dayTasks.map(task => (
