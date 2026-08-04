@@ -23,79 +23,172 @@ const DEFAULT_TABS = [
   { id: 'ap', name: 'AP' }
 ];
 
-// Default Initial Categories per Tab with Relevant Icons
+// Initial Categories Loaded from PDF Data
 const INITIAL_CATEGORIES = {
   personal: [
-    { id: 'tech', name: 'Tech', icon: 'laptop', color: '#06b6d4' },
-    { id: 'clean', name: 'Clean', icon: 'sparkles', color: '#10b981' },
-    { id: 'errands', name: 'Errands', icon: 'shopping-bag', color: '#f59e0b' },
-    { id: 'health', name: 'Health', icon: 'heart-pulse', color: '#ec4899' }
+    { id: 'tasks', name: 'Tasks', icon: 'check-square', color: '#06b6d4' },
+    { id: 'computer', name: 'Computer', icon: 'laptop', color: '#3b82f6' },
+    { id: 'meetings', name: 'Meetings', icon: 'users', color: '#8b5cf6' },
+    { id: 'amin', name: 'Amin', icon: 'star', color: '#f59e0b' },
+    { id: 'swap', name: 'Swap', icon: 'tag', color: '#ec4899' },
+    { id: 'tracking', name: 'Tracking', icon: 'target', color: '#10b981' },
+    { id: 'fbmarketplace', name: 'FB Marketplace', icon: 'shopping-bag', color: '#f97316' }
   ],
   work: [
-    { id: 'networking', name: 'Networking', icon: 'users', color: '#8b5cf6' },
-    { id: 'scheduling', name: 'Scheduling', icon: 'calendar', color: '#6366f1' },
-    { id: 'projects', name: 'Projects', icon: 'folder-kanban', color: '#3b82f6' },
-    { id: 'followups', name: 'Follow-ups', icon: 'check-square', color: '#14b8a6' }
+    { id: 'work-google', name: 'Google Core', icon: 'folder-kanban', color: '#4f46e5' },
+    { id: 'work-grad', name: 'GRAD & Projects', icon: 'compass', color: '#6366f1' }
   ],
   ap: [
-    { id: 'finance', name: 'Finance & Bills', icon: 'dollar-sign', color: '#10b981' },
-    { id: 'home', name: 'Home Maintenance', icon: 'home', color: '#f97316' },
-    { id: 'planning', name: 'Planning', icon: 'compass', color: '#a855f7' }
+    { id: 'ap-tasks', name: 'Tasks', icon: 'check-square', color: '#10b981' },
+    { id: 'ap-conversations', name: 'Conversations', icon: 'smile', color: '#8b5cf6' },
+    { id: 'ap-roomclean', name: 'Room Clean', icon: 'sparkles', color: '#06b6d4' }
   ]
 };
 
-// Initial Sample Tasks
+// Initial Tasks Loaded from "Al-Rahim To Do.pdf"
 const INITIAL_TASKS = [
-  {
-    id: 't-1',
-    title: 'Update laptop OS & backup critical files',
-    tabId: 'personal',
-    categoryId: 'tech',
-    isHighPriority: true,
-    scheduledDay: 'mon',
-    isCompleted: false,
-    completedAt: null
-  },
-  {
-    id: 't-2',
-    title: 'Deep clean kitchen counters & pantry',
-    tabId: 'personal',
-    categoryId: 'clean',
-    isHighPriority: false,
-    scheduledDay: 'sat',
-    isCompleted: false,
-    completedAt: null
-  },
-  {
-    id: 't-3',
-    title: 'Schedule Q3 strategy call with team',
-    tabId: 'work',
-    categoryId: 'scheduling',
-    isHighPriority: true,
-    scheduledDay: 'tue',
-    isCompleted: false,
-    completedAt: null
-  },
-  {
-    id: 't-4',
-    title: 'Reach out to 3 industry partners on LinkedIn',
-    tabId: 'work',
-    categoryId: 'networking',
-    isHighPriority: false,
-    scheduledDay: 'wed',
-    isCompleted: false,
-    completedAt: null
-  },
-  {
-    id: 't-5',
-    title: 'Review quarterly tax payment invoice',
-    tabId: 'ap',
-    categoryId: 'finance',
-    isHighPriority: true,
-    scheduledDay: 'thu',
-    isCompleted: false,
-    completedAt: null
-  }
+  // =========================================================================
+  // PERSONAL TAB (Al-Rahim section)
+  // =========================================================================
+  // Tasks Category
+  { id: 'pdf-p1', title: 'Install Toyota Bulb', tabId: 'personal', categoryId: 'tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-p2', title: 'Vitamins', tabId: 'personal', categoryId: 'tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-p3', title: 'Technogym exercises', tabId: 'personal', categoryId: 'tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-p4', title: 'Justin Rent', tabId: 'personal', categoryId: 'tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-p5', title: 'PNFLA', tabId: 'personal', categoryId: 'tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-p6', title: 'Southwest refunds', tabId: 'personal', categoryId: 'tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-p7', title: 'Fix MX Vertical Mouse', tabId: 'personal', categoryId: 'tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-p8', title: 'Fix MX Master 2 Mouse', tabId: 'personal', categoryId: 'tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-p9', title: 'Cambria Care Package', tabId: 'personal', categoryId: 'tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-p10', title: 'Alykhan iPad and Pencil', tabId: 'personal', categoryId: 'tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-p11', title: 'Teva Shoe Glue', tabId: 'personal', categoryId: 'tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-p12', title: 'Gap/ON/BRF & APPL GC', tabId: 'personal', categoryId: 'tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-p13', title: 'Decide on MX Keys', tabId: 'personal', categoryId: 'tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-p14', title: 'Patagonia about A/C deletion', tabId: 'personal', categoryId: 'tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-p15', title: 'Barnes & Noble GC', tabId: 'personal', categoryId: 'tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-p16', title: 'Steelcase Chair Repair', tabId: 'personal', categoryId: 'tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+
+  // Computer Category
+  { id: 'pdf-pc1', title: 'Duplicate HD Copy', tabId: 'personal', categoryId: 'computer', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pc2', title: 'Clean out other G Computers', tabId: 'personal', categoryId: 'computer', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pc3', title: 'EOY Paychecks to HD', tabId: 'personal', categoryId: 'computer', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pc4', title: 'go/prosper documentation', tabId: 'personal', categoryId: 'computer', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pc5', title: 'Scan SRS-F to search PDF', tabId: 'personal', categoryId: 'computer', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pc6', title: 'BTK Orientation Notes', tabId: 'personal', categoryId: 'computer', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pc7', title: 'iPhone Notes', tabId: 'personal', categoryId: 'computer', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pc8', title: 'iPhone Voicemails', tabId: 'personal', categoryId: 'computer', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pc9', title: 'iPhone Voice notes', tabId: 'personal', categoryId: 'computer', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pc10', title: 'Google vs VTI', tabId: 'personal', categoryId: 'computer', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pc11', title: 'MBP 13" GP Mom HD upload', tabId: 'personal', categoryId: 'computer', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pc12', title: 'Pixel watch setup', tabId: 'personal', categoryId: 'computer', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pc13', title: 'Transfer 16P -> 15A', tabId: 'personal', categoryId: 'computer', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pc14', title: 'HSA receipts / scans to GP', tabId: 'personal', categoryId: 'computer', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pc15', title: 'Cell phone charge & update', tabId: 'personal', categoryId: 'computer', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+
+  // Meetings Category
+  { id: 'pdf-pm1', title: 'Asif Makhani', tabId: 'personal', categoryId: 'meetings', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pm2', title: 'Farida Hemani', tabId: 'personal', categoryId: 'meetings', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pm3', title: 'Nick & Rachel', tabId: 'personal', categoryId: 'meetings', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pm4', title: 'Zoheb MWWP', tabId: 'personal', categoryId: 'meetings', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+
+  // Amin Category
+  { id: 'pdf-pa1', title: 'Geico Glass Update', tabId: 'personal', categoryId: 'amin', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pa2', title: 'DSND IRS Penalty', tabId: 'personal', categoryId: 'amin', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pa3', title: 'DSND IRS Trackers (interest)', tabId: 'personal', categoryId: 'amin', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pa4', title: 'MS Beneficiaries', tabId: 'personal', categoryId: 'amin', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pa5', title: 'Vegas', tabId: 'personal', categoryId: 'amin', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pa6', title: 'Vancouver / Toronto', tabId: 'personal', categoryId: 'amin', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+
+  // Swap Category
+  { id: 'pdf-ps1', title: 'Banana Republic White Linen', tabId: 'personal', categoryId: 'swap', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-ps2', title: 'Target Pants Order', tabId: 'personal', categoryId: 'swap', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+
+  // Tracking Category
+  { id: 'pdf-pt1', title: 'Contact Solution', tabId: 'personal', categoryId: 'tracking', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pt2', title: 'WG Ear Wax Removal', tabId: 'personal', categoryId: 'tracking', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pt3', title: 'Vitamins', tabId: 'personal', categoryId: 'tracking', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pt4', title: 'Granola', tabId: 'personal', categoryId: 'tracking', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pt5', title: 'Costco Protein', tabId: 'personal', categoryId: 'tracking', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pt6', title: 'Target Face Wash', tabId: 'personal', categoryId: 'tracking', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+
+  // FB Marketplace Category
+  { id: 'pdf-pfb1', title: 'J Crew Clothes (new)', tabId: 'personal', categoryId: 'fbmarketplace', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pfb2', title: 'Brooks Brothers Clothes (new)', tabId: 'personal', categoryId: 'fbmarketplace', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pfb3', title: 'Goodmanbrand Clothes (new)', tabId: 'personal', categoryId: 'fbmarketplace', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pfb4', title: 'Alyna Chair', tabId: 'personal', categoryId: 'fbmarketplace', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-pfb5', title: 'Tech Stuff', tabId: 'personal', categoryId: 'fbmarketplace', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+
+  // =========================================================================
+  // AP TAB (Amreen section)
+  // =========================================================================
+  // Tasks Category
+  { id: 'pdf-ap1', title: 'Snap Clean', tabId: 'ap', categoryId: 'ap-tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-ap2', title: 'Whatsapp Groups Clean', tabId: 'ap', categoryId: 'ap-tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-ap3', title: 'Instagram Saved', tabId: 'ap', categoryId: 'ap-tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-ap4', title: 'Coasters', tabId: 'ap', categoryId: 'ap-tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-ap5', title: 'Macrame', tabId: 'ap', categoryId: 'ap-tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-ap6', title: 'ICH Painting', tabId: 'ap', categoryId: 'ap-tasks', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+
+  // Conversations Category
+  { id: 'pdf-ac1', title: 'TPBTL', tabId: 'ap', categoryId: 'ap-conversations', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-ac2', title: 'Past', tabId: 'ap', categoryId: 'ap-conversations', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-ac3', title: 'MCO Stock from MS to Fidelity', tabId: 'ap', categoryId: 'ap-conversations', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-ac4', title: 'Email Reviews', tabId: 'ap', categoryId: 'ap-conversations', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-ac5', title: 'Paper filer', tabId: 'ap', categoryId: 'ap-conversations', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+
+  // Room Clean Category
+  { id: 'pdf-ar1', title: 'Suitcases', tabId: 'ap', categoryId: 'ap-roomclean', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-ar2', title: 'Corovan Boxes', tabId: 'ap', categoryId: 'ap-roomclean', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-ar3', title: 'Vita Health', tabId: 'ap', categoryId: 'ap-roomclean', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-ar4', title: 'Tech Stuff', tabId: 'ap', categoryId: 'ap-roomclean', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-ar5', title: 'Closet / Drawers', tabId: 'ap', categoryId: 'ap-roomclean', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-ar6', title: 'Under Bed', tabId: 'ap', categoryId: 'ap-roomclean', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-ar7', title: 'White Cabinet', tabId: 'ap', categoryId: 'ap-roomclean', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+
+  // =========================================================================
+  // WORK TAB (Google section)
+  // =========================================================================
+  // Google Core Category
+  { id: 'pdf-w1', title: 'Portfolio', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-w2', title: 'Resume', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-w3', title: 'Team Perf/GRAD artifacts', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-w4', title: 'Networking Meetings', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-w5', title: 'UXR Handbook', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-w6', title: 'Massage', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-w7', title: 'Mariam Conversation', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-w8', title: 'Spot Bonus $200', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-w9', title: 'Google/IO', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-w10', title: 'Meriah Top of Mind', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-w11', title: 'John Lyndon (API Key, MCP, Skills, Gemini Enterprise, Blueprints)', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-w12', title: 'Ben Colab R', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-w13', title: 'UX Announce', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-w14', title: 'Transformational Tuesdays', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-w15', title: 'Builders Week', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-w16', title: 'Methods Classes (AI Fluency)', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-w17', title: 'go/aisavvygoogle', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-w18', title: 'go/ml', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-w19', title: 'go/uxw-signups', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-w20', title: 'ML/AI resources', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-w21', title: '100 ways to make your life...', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-w22', title: 'Tyler IMEI', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-w23', title: 'Betterup Manager Coaching', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-w24', title: 'Mgr Dev Series: Foundations', tabId: 'work', categoryId: 'work-google', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+
+  // GRAD & Projects Category
+  { id: 'pdf-wg1', title: 'Home', tabId: 'work', categoryId: 'work-grad', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-wg2', title: 'UI Library', tabId: 'work', categoryId: 'work-grad', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-wg3', title: 'LisApps', tabId: 'work', categoryId: 'work-grad', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-wg4', title: 'Inspector', tabId: 'work', categoryId: 'work-grad', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-wg5', title: 'Annotations', tabId: 'work', categoryId: 'work-grad', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-wg6', title: 'Comments', tabId: 'work', categoryId: 'work-grad', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-wg7', title: 'Experiments', tabId: 'work', categoryId: 'work-grad', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-wg8', title: 'Previews', tabId: 'work', categoryId: 'work-grad', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-wg9', title: 'MEP 2025', tabId: 'work', categoryId: 'work-grad', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-wg10', title: 'Joanne (Brazil)', tabId: 'work', categoryId: 'work-grad', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-wg11', title: 'Emily (Counsel Assist)', tabId: 'work', categoryId: 'work-grad', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-wg12', title: 'Emily (RA Workshop)', tabId: 'work', categoryId: 'work-grad', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-wg13', title: 'Self Service Contracts', tabId: 'work', categoryId: 'work-grad', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null },
+  { id: 'pdf-wg14', title: 'BH Survey (Abhinav)', tabId: 'work', categoryId: 'work-grad', isHighPriority: false, scheduledDay: null, isCompleted: false, completedAt: null }
 ];
 
 export default function App() {
@@ -106,7 +199,7 @@ export default function App() {
 
   // Top-Level Tabs State
   const [tabs, setTabs] = useState(() => {
-    const saved = localStorage.getItem('artodo_tabs_v2');
+    const saved = localStorage.getItem('artodo_tabs_v3');
     return saved ? JSON.parse(saved) : DEFAULT_TABS;
   });
 
@@ -128,15 +221,15 @@ export default function App() {
   const [isNewTabModalOpen, setIsNewTabModalOpen] = useState(false);
   const [isTabSettingsOpen, setIsTabSettingsOpen] = useState(false);
 
-  // Categories State
+  // Categories State loaded from PDF
   const [categories, setCategories] = useState(() => {
-    const saved = localStorage.getItem('artodo_categories_v1');
+    const saved = localStorage.getItem('artodo_categories_v3');
     return saved ? JSON.parse(saved) : INITIAL_CATEGORIES;
   });
 
-  // Tasks State
+  // Tasks State loaded from PDF
   const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem('artodo_tasks_v1');
+    const saved = localStorage.getItem('artodo_tasks_v3');
     return saved ? JSON.parse(saved) : INITIAL_TASKS;
   });
 
@@ -162,17 +255,17 @@ export default function App() {
     localStorage.setItem('artodo_theme', theme);
   }, [theme]);
 
-  // Persist State to LocalStorage
+  // Persist State to LocalStorage (v3 key)
   useEffect(() => {
-    localStorage.setItem('artodo_tabs_v2', JSON.stringify(tabs));
+    localStorage.setItem('artodo_tabs_v3', JSON.stringify(tabs));
   }, [tabs]);
 
   useEffect(() => {
-    localStorage.setItem('artodo_categories_v1', JSON.stringify(categories));
+    localStorage.setItem('artodo_categories_v3', JSON.stringify(categories));
   }, [categories]);
 
   useEffect(() => {
-    localStorage.setItem('artodo_tasks_v1', JSON.stringify(tasks));
+    localStorage.setItem('artodo_tasks_v3', JSON.stringify(tasks));
   }, [tasks]);
 
   useEffect(() => {
@@ -197,6 +290,17 @@ export default function App() {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
   };
 
+  // Reset to PDF Data
+  const handleResetToPdfData = () => {
+    setCategories(INITIAL_CATEGORIES);
+    setTasks(INITIAL_TASKS);
+    setTabs(DEFAULT_TABS);
+    setActiveTab('personal');
+    localStorage.setItem('artodo_categories_v3', JSON.stringify(INITIAL_CATEGORIES));
+    localStorage.setItem('artodo_tasks_v3', JSON.stringify(INITIAL_TASKS));
+    localStorage.setItem('artodo_tabs_v3', JSON.stringify(DEFAULT_TABS));
+  };
+
   // Top Level Tab Handlers
   const handleCreateTab = (tabName) => {
     if (!tabName.trim()) return;
@@ -219,7 +323,7 @@ export default function App() {
   };
 
   const handleDeleteTab = (tabId) => {
-    if (tabs.length <= 1) return; // Must keep at least 1 tab
+    if (tabs.length <= 1) return;
 
     const tabToDelete = tabs.find(t => t.id === tabId);
     if (!tabToDelete) return;
@@ -227,10 +331,8 @@ export default function App() {
     const tabCatList = categories[tabId] || [];
     const tabTaskList = tasks.filter(t => t.tabId === tabId);
 
-    // Archive tab
     setArchivedTabs(prev => [...prev, { tab: tabToDelete, categories: tabCatList, tasks: tabTaskList }]);
 
-    // Remove tab
     const remaining = tabs.filter(t => t.id !== tabId);
     setTabs(remaining);
     setTasks(prev => prev.filter(t => t.tabId !== tabId));
@@ -247,7 +349,6 @@ export default function App() {
     const archivedItem = archivedTabs.find(item => item.tab.id === tabId);
     if (!archivedItem) return;
 
-    // Restore tab, categories, and tasks
     setTabs(prev => [...prev, archivedItem.tab]);
     setCategories(prev => ({
       ...prev,
@@ -255,7 +356,6 @@ export default function App() {
     }));
     setTasks(prev => [...prev, ...archivedItem.tasks]);
 
-    // Remove from archivedTabs
     setArchivedTabs(prev => prev.filter(item => item.tab.id !== tabId));
     setActiveTab(tabId);
   };
@@ -275,7 +375,6 @@ export default function App() {
     setTasks(prev => [...prev, newTask]);
   };
 
-  // Complete Task (removes task everywhere, archives it with timestamp)
   const handleToggleComplete = (taskId) => {
     setTasks(prev => prev.map(t => {
       if (t.id === taskId) {
@@ -289,12 +388,10 @@ export default function App() {
     }));
   };
 
-  // Restore Completed Task back to active lists
   const handleRestoreTask = (taskId) => {
     const taskToRestore = tasks.find(t => t.id === taskId);
     if (!taskToRestore) return;
 
-    // Check if task's category was deleted and exists in archivedCategories
     const archivedCatItem = archivedCategories.find(c => c.category.id === taskToRestore.categoryId);
     if (archivedCatItem) {
       handleRestoreCategory(archivedCatItem.category.id);
@@ -312,12 +409,10 @@ export default function App() {
     }));
   };
 
-  // Clear Completed History
   const handleClearCompletedHistory = () => {
     setTasks(prev => prev.filter(t => !t.isCompleted));
   };
 
-  // Priority toggle (moves task into/out of Urgent column automatically)
   const handleTogglePriority = (taskId) => {
     setTasks(prev => prev.map(t => {
       if (t.id === taskId) {
@@ -327,7 +422,6 @@ export default function App() {
     }));
   };
 
-  // Inline Title Update
   const handleUpdateTaskTitle = (taskId, newTitle) => {
     setTasks(prev => prev.map(t => {
       if (t.id === taskId) {
@@ -341,7 +435,6 @@ export default function App() {
     setTasks(prev => prev.filter(t => t.id !== taskId));
   };
 
-  // Drag & Drop Handlers
   const handleDropTaskToCategory = (taskId, targetCategoryId) => {
     setTasks(prev => prev.map(t => {
       if (t.id === taskId) {
@@ -367,7 +460,6 @@ export default function App() {
     }));
   };
 
-  // Category Handlers
   const handleAddCategory = (e) => {
     e.preventDefault();
     if (!newCategoryName.trim()) return;
@@ -393,7 +485,6 @@ export default function App() {
     setShowNewCatInput(false);
   };
 
-  // Delete Category
   const handleDeleteCategory = (catId) => {
     const catList = categories[activeTab] || [];
     const catToDelete = catList.find(c => c.id === catId);
@@ -414,7 +505,6 @@ export default function App() {
     setTasks(prev => prev.filter(t => t.categoryId !== catId));
   };
 
-  // Restore Deleted Category & Sub-tasks
   const handleRestoreCategory = (catId) => {
     const archivedItem = archivedCategories.find(item => item.category.id === catId);
     if (!archivedItem) return;
@@ -600,7 +690,7 @@ export default function App() {
         />
 
         {/* ========================================================================= */}
-        {/* CATEGORY COLUMNS GRID (AUTO URGENT COLUMN ON LEFT-MOST SIDE)              */}
+        {/* CATEGORY COLUMNS GRID                                                     */}
         {/* ========================================================================= */}
         <section>
           <div className="categories-grid-header">
