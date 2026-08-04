@@ -191,7 +191,7 @@ export default function App() {
   // Active Tab State
   const [activeTab, setActiveTab] = useState(() => tabs[0]?.id || 'personal');
 
-  // Search Query State (Global Search Across All Tabs)
+  // Search Query State
   const [searchQuery, setSearchQuery] = useState('');
 
   // Theme State
@@ -276,6 +276,45 @@ export default function App() {
 
   const toggleTheme = () => {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+  };
+
+  // Drag and Drop Reordering of Top-Level Tabs
+  const handleDropTab = (e, targetTabId) => {
+    e.preventDefault();
+    const sourceTabId = e.dataTransfer.getData('text/tab-id');
+    if (!sourceTabId || sourceTabId === targetTabId) return;
+
+    setTabs(prevTabs => {
+      const fromIndex = prevTabs.findIndex(t => t.id === sourceTabId);
+      const toIndex = prevTabs.findIndex(t => t.id === targetTabId);
+      if (fromIndex < 0 || toIndex < 0) return prevTabs;
+
+      const newTabs = [...prevTabs];
+      const [movedTab] = newTabs.splice(fromIndex, 1);
+      newTabs.splice(toIndex, 0, movedTab);
+      return newTabs;
+    });
+  };
+
+  // Drag and Drop Reordering of Categories inside Active Tab
+  const handleReorderCategory = (sourceCatId, targetCatId) => {
+    if (sourceCatId === targetCatId) return;
+
+    setCategories(prev => {
+      const activeCats = prev[activeTab] || [];
+      const fromIndex = activeCats.findIndex(c => c.id === sourceCatId);
+      const toIndex = activeCats.findIndex(c => c.id === targetCatId);
+      if (fromIndex < 0 || toIndex < 0) return prev;
+
+      const newCats = [...activeCats];
+      const [movedCat] = newCats.splice(fromIndex, 1);
+      newCats.splice(toIndex, 0, movedCat);
+
+      return {
+        ...prev,
+        [activeTab]: newCats
+      };
+    });
   };
 
   // Top Level Tab Handlers
@@ -536,7 +575,6 @@ export default function App() {
     }));
   };
 
-  // Select Tab From Search Result Location Badge
   const handleSelectTabFromSearch = (tabId) => {
     setActiveTab(tabId);
     setSearchQuery('');
@@ -554,7 +592,7 @@ export default function App() {
       .sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0));
   }, [tasks]);
 
-  // Global Search Filter (Across ALL Tabs)
+  // Global Search Filter
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) return [];
     const query = searchQuery.toLowerCase().trim();
@@ -597,7 +635,7 @@ export default function App() {
           <h1 className="header-title">AR To Do</h1>
         </div>
 
-        {/* Clean Top-Level Tabs */}
+        {/* Clean Top-Level Tabs (Draggable for Reordering Tabs!) */}
         <nav className="header-tabs" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
           {tabs.map(tab => (
             <button 
@@ -607,6 +645,13 @@ export default function App() {
                 setActiveTab(tab.id);
                 setSearchQuery('');
               }}
+              draggable={true}
+              onDragStart={(e) => {
+                e.dataTransfer.setData('text/tab-id', tab.id);
+              }}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => handleDropTab(e, tab.id)}
+              title="Click to activate or drag to reorder tabs"
             >
               <span>{tab.name}</span>
               <span className="tab-count-badge">
@@ -814,6 +859,7 @@ export default function App() {
                     onDeleteTask={handleDeleteTask}
                     onDropTaskToCategory={handleDropTaskToCategory}
                     onDeleteCategory={handleDeleteCategory}
+                    onReorderCategory={handleReorderCategory}
                   />
                 );
               })}

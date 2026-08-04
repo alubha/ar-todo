@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, GripVertical } from 'lucide-react';
 import TaskCard from './TaskCard';
 import CategoryIconPicker from './CategoryIconPicker';
 
@@ -14,7 +14,8 @@ export default function CategoryColumn({
   onUpdateCategoryIcon,
   onDeleteTask,
   onDropTaskToCategory,
-  onDeleteCategory
+  onDeleteCategory,
+  onReorderCategory
 }) {
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [isDragOver, setIsDragOver] = useState(false);
@@ -42,6 +43,17 @@ export default function CategoryColumn({
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragOver(false);
+
+    // Check if dropping a Category (for reordering)
+    const sourceCatId = e.dataTransfer.getData('text/category-id');
+    if (sourceCatId) {
+      if (onReorderCategory && sourceCatId !== category.id) {
+        onReorderCategory(sourceCatId, category.id);
+      }
+      return;
+    }
+
+    // Check if dropping a Task
     const taskId = e.dataTransfer.getData('text/plain');
     if (taskId && onDropTaskToCategory) {
       onDropTaskToCategory(taskId, category.id);
@@ -71,10 +83,27 @@ export default function CategoryColumn({
   };
 
   return (
-    <div className={`category-column ${category.isAutoUrgent ? 'urgent-column' : ''}`}>
-      {/* Category Column Header */}
-      <div className="category-column-header">
+    <div 
+      className={`category-column ${category.isAutoUrgent ? 'urgent-column' : ''}`}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
+      {/* Category Column Header (Draggable for reordering columns) */}
+      <div 
+        className="category-column-header"
+        draggable={!category.isAutoUrgent && !isEditingCatName}
+        onDragStart={(e) => {
+          if (category.isAutoUrgent || isEditingCatName) return;
+          e.dataTransfer.setData('text/category-id', category.id);
+        }}
+        style={{ cursor: category.isAutoUrgent ? 'default' : 'grab' }}
+      >
         <div className="category-title-group">
+          {!category.isAutoUrgent && (
+            <GripVertical size={13} style={{ color: 'var(--text-dim)', opacity: 0.6, cursor: 'grab' }} />
+          )}
+
           {/* Interactive Category Icon & Color Picker */}
           <CategoryIconPicker
             currentIcon={category.icon || 'tag'}
@@ -95,7 +124,7 @@ export default function CategoryColumn({
           ) : (
             <h3 
               className="category-name" 
-              title={category.isAutoUrgent ? "Auto-generated Urgent column" : "Click to edit category name"}
+              title={category.isAutoUrgent ? "Auto-generated Urgent column" : "Click to edit category name (drag header to reorder)"}
               onClick={() => !category.isAutoUrgent && setIsEditingCatName(true)}
             >
               {category.name}
@@ -117,12 +146,7 @@ export default function CategoryColumn({
       </div>
 
       {/* Category Task Dropzone & Card List */}
-      <div 
-        className={`category-dropzone ${isDragOver ? 'drag-over' : ''}`}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-      >
+      <div className={`category-dropzone ${isDragOver ? 'drag-over' : ''}`}>
         {tasks.length === 0 ? (
           <div className="empty-state">
             No tasks
