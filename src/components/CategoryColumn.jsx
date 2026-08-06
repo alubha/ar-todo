@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { Trash2, GripVertical } from 'lucide-react';
+import { Trash2, GripVertical, ChevronLeft, ChevronRight } from 'lucide-react';
 import TaskCard from './TaskCard';
 import CategoryIconPicker from './CategoryIconPicker';
 
 export default function CategoryColumn({
   category,
   tasks,
+  canMoveLeft,
+  canMoveRight,
+  onMoveDirection,
   onAddTask,
   onToggleComplete,
   onTogglePriority,
@@ -15,12 +18,32 @@ export default function CategoryColumn({
   onDeleteTask,
   onDropTaskToCategory,
   onDeleteCategory,
-  onReorderCategory
+  onReorderCategory,
+  onCategoryDragStart,
+  onCategoryDragEnd,
+  tabId
 }) {
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [isDragOver, setIsDragOver] = useState(false);
   const [isEditingCatName, setIsEditingCatName] = useState(false);
   const [catName, setCatName] = useState(category.name);
+
+  const isAPTab = tabId === 'ap' || category.tabId === 'ap';
+  const isWorkTab = tabId === 'work' || category.tabId === 'work';
+
+  let tabHeaderClass = '';
+  let iconColor = category.color || '#4f46e5';
+  let gripColor = '#ffffff';
+
+  if (isAPTab) {
+    tabHeaderClass = 'ap-tab-header';
+    iconColor = '#F8B4C5';
+    gripColor = '#1e293b';
+  } else if (isWorkTab) {
+    tabHeaderClass = 'work-tab-header';
+    iconColor = '#FBBC04';
+    gripColor = '#1e293b';
+  }
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
@@ -33,6 +56,7 @@ export default function CategoryColumn({
 
   const handleDragOver = (e) => {
     e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
     setIsDragOver(true);
   };
 
@@ -42,21 +66,27 @@ export default function CategoryColumn({
 
   const handleDrop = (e) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragOver(false);
 
-    // Check if dropping a Category (for reordering)
-    const sourceCatId = e.dataTransfer.getData('text/category-id');
-    if (sourceCatId) {
-      if (onReorderCategory && sourceCatId !== category.id) {
-        onReorderCategory(sourceCatId, category.id);
+    // 1. Check if dropping a Category (for reordering)
+    let rawCatId = e.dataTransfer.getData('text/category-id');
+    const plainData = e.dataTransfer.getData('text/plain');
+
+    if (!rawCatId && plainData && plainData.startsWith('category:')) {
+      rawCatId = plainData.replace('category:', '');
+    }
+
+    if (rawCatId) {
+      if (onReorderCategory && rawCatId !== category.id) {
+        onReorderCategory(rawCatId, category.id);
       }
       return;
     }
 
-    // Check if dropping a Task
-    const taskId = e.dataTransfer.getData('text/plain');
-    if (taskId && onDropTaskToCategory) {
-      onDropTaskToCategory(taskId, category.id);
+    // 2. Check if dropping a Task
+    if (plainData && !plainData.startsWith('category:') && onDropTaskToCategory) {
+      onDropTaskToCategory(plainData, category.id);
     }
   };
 
@@ -84,32 +114,52 @@ export default function CategoryColumn({
 
   return (
     <div 
-      className={`category-column ${category.isAutoUrgent ? 'urgent-column' : ''}`}
+      className={`category-column ${category.isAutoUrgent ? 'urgent-column' : ''} ${isDragOver ? 'drag-over' : ''}`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
       {/* Category Column Header (Draggable for reordering columns) */}
       <div 
-        className="category-column-header"
+        className={`category-column-header ${tabHeaderClass}`}
         draggable={!category.isAutoUrgent && !isEditingCatName}
         onDragStart={(e) => {
           if (category.isAutoUrgent || isEditingCatName) return;
           e.dataTransfer.setData('text/category-id', category.id);
+          e.dataTransfer.setData('text/plain', `category:${category.id}`);
+          e.dataTransfer.effectAllowed = 'move';
+          if (onCategoryDragStart) onCategoryDragStart();
+        }}
+        onDragEnd={() => {
+          if (onCategoryDragEnd) onCategoryDragEnd();
         }}
         style={{ cursor: category.isAutoUrgent ? 'default' : 'grab' }}
       >
         <div className="category-title-group">
           {!category.isAutoUrgent && (
-            <GripVertical size={13} style={{ color: 'var(--text-dim)', opacity: 0.6, cursor: 'grab' }} />
+            <GripVertical size={13} className="grip-icon" style={{ color: gripColor, opacity: 0.8, cursor: 'grab' }} />
           )}
 
           {/* Interactive Category Icon & Color Picker */}
           <CategoryIconPicker
             currentIcon={category.icon || 'tag'}
-            currentColor={category.color || '#4f46e5'}
+            currentColor={iconColor}
             onSelectIcon={(data) => !category.isAutoUrgent && onUpdateCategoryIcon && onUpdateCategoryIcon(category.id, data)}
           />
+
+          {/* Left Arrow Button for Shift Left */}
+          {!category.isAutoUrgent && canMoveLeft && (
+            <button
+              className="category-arrow-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onMoveDirection) onMoveDirection(category.id, 'left');
+              }}
+              title="Move category left"
+            >
+              <ChevronLeft size={13} />
+            </button>
+          )}
 
           {!category.isAutoUrgent && isEditingCatName ? (
             <input
@@ -124,11 +174,25 @@ export default function CategoryColumn({
           ) : (
             <h3 
               className="category-name" 
-              title={category.isAutoUrgent ? "Auto-generated Urgent column" : "Click to edit category name (drag header to reorder)"}
+              title={category.isAutoUrgent ? "Auto-generated Urgent column" : "Click to edit category name (drag header or use arrows to reorder)"}
               onClick={() => !category.isAutoUrgent && setIsEditingCatName(true)}
             >
               {category.name}
             </h3>
+          )}
+
+          {/* Right Arrow Button for Shift Right */}
+          {!category.isAutoUrgent && canMoveRight && (
+            <button
+              className="category-arrow-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onMoveDirection) onMoveDirection(category.id, 'right');
+              }}
+              title="Move category right"
+            >
+              <ChevronRight size={13} />
+            </button>
           )}
 
           <span className="category-task-count">{tasks.length}</span>
@@ -146,7 +210,7 @@ export default function CategoryColumn({
       </div>
 
       {/* Category Task Dropzone & Card List */}
-      <div className={`category-dropzone ${isDragOver ? 'drag-over' : ''}`}>
+      <div className="category-dropzone">
         {tasks.length === 0 ? (
           <div className="empty-state">
             No tasks

@@ -9,6 +9,7 @@ import {
   Settings,
   Lock,
   Search,
+  Flame,
   X
 } from 'lucide-react';
 import AuthModal from './components/AuthModal';
@@ -26,7 +27,7 @@ const DEFAULT_TABS = [
   { id: 'ap', name: 'AP' }
 ];
 
-// Initial Categories Loaded from PDF Data
+// Initial Categories Loaded from PDF Data (AP Tab: #F8B4C5, Work Tab: #FBBC04)
 const INITIAL_CATEGORIES = {
   personal: [
     { id: 'tasks', name: 'Tasks', icon: 'check-square', color: '#06b6d4' },
@@ -38,13 +39,13 @@ const INITIAL_CATEGORIES = {
     { id: 'fbmarketplace', name: 'FB Marketplace', icon: 'shopping-bag', color: '#f97316' }
   ],
   work: [
-    { id: 'work-google', name: 'Google Core', icon: 'folder-kanban', color: '#4f46e5' },
-    { id: 'work-grad', name: 'GRAD & Projects', icon: 'compass', color: '#6366f1' }
+    { id: 'work-google', name: 'Google Core', icon: 'folder-kanban', color: '#FBBC04' },
+    { id: 'work-grad', name: 'GRAD & Projects', icon: 'compass', color: '#FBBC04' }
   ],
   ap: [
-    { id: 'ap-tasks', name: 'Tasks', icon: 'check-square', color: '#10b981' },
-    { id: 'ap-conversations', name: 'Conversations', icon: 'smile', color: '#8b5cf6' },
-    { id: 'ap-roomclean', name: 'Room Clean', icon: 'sparkles', color: '#06b6d4' }
+    { id: 'ap-tasks', name: 'Tasks', icon: 'check-square', color: '#F8B4C5' },
+    { id: 'ap-conversations', name: 'Conversations', icon: 'smile', color: '#F8B4C5' },
+    { id: 'ap-roomclean', name: 'Room Clean', icon: 'sparkles', color: '#F8B4C5' }
   ]
 };
 
@@ -194,6 +195,12 @@ export default function App() {
   // Search Query State
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Urgent Column Flame Toggle State
+  const [showUrgentColumn, setShowUrgentColumn] = useState(() => {
+    const saved = localStorage.getItem('artodo_show_urgent');
+    return saved !== null ? saved === 'true' : true;
+  });
+
   // Theme State
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('artodo_theme') || 'light';
@@ -215,10 +222,24 @@ export default function App() {
     return saved ? JSON.parse(saved) : INITIAL_CATEGORIES;
   });
 
-  // Tasks State
+  // Tasks State (with auto-migration for orphan 'urgent-auto-col' categoryIds)
   const [tasks, setTasks] = useState(() => {
     const saved = localStorage.getItem('artodo_tasks_v3');
-    return saved ? JSON.parse(saved) : INITIAL_TASKS;
+    const rawTasks = saved ? JSON.parse(saved) : INITIAL_TASKS;
+    
+    // Auto-fix any tasks whose categoryId was set to 'urgent-auto-col'
+    return rawTasks.map(t => {
+      if (t.categoryId === 'urgent-auto-col') {
+        const tabCats = (INITIAL_CATEGORIES[t.tabId] || []);
+        const fallbackCatId = tabCats[0]?.id || 'tasks';
+        return {
+          ...t,
+          categoryId: fallbackCatId,
+          isHighPriority: true
+        };
+      }
+      return t;
+    });
   });
 
   // Archived Deleted Categories State
@@ -255,6 +276,10 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('artodo_tasks_v3', JSON.stringify(tasks));
   }, [tasks]);
+
+  useEffect(() => {
+    localStorage.setItem('artodo_show_urgent', String(showUrgentColumn));
+  }, [showUrgentColumn]);
 
   useEffect(() => {
     localStorage.setItem('artodo_archived_categories_v1', JSON.stringify(archivedCategories));
@@ -296,19 +321,42 @@ export default function App() {
     });
   };
 
-  // Drag and Drop Reordering of Categories inside Active Tab
+  // Drag and Drop Reordering of Categories inside Active Tab (by target category ID)
   const handleReorderCategory = (sourceCatId, targetCatId) => {
-    if (sourceCatId === targetCatId) return;
+    const cleanSourceId = sourceCatId.replace('category:', '');
+    const cleanTargetId = targetCatId.replace('category:', '');
+    if (cleanSourceId === cleanTargetId) return;
 
     setCategories(prev => {
       const activeCats = prev[activeTab] || [];
-      const fromIndex = activeCats.findIndex(c => c.id === sourceCatId);
-      const toIndex = activeCats.findIndex(c => c.id === targetCatId);
+      const fromIndex = activeCats.findIndex(c => c.id === cleanSourceId);
+      const toIndex = activeCats.findIndex(c => c.id === cleanTargetId);
       if (fromIndex < 0 || toIndex < 0) return prev;
 
       const newCats = [...activeCats];
       const [movedCat] = newCats.splice(fromIndex, 1);
       newCats.splice(toIndex, 0, movedCat);
+
+      return {
+        ...prev,
+        [activeTab]: newCats
+      };
+    });
+  };
+
+  // Shift Category Left or Right via Arrow Controls
+  const handleMoveCategoryDirection = (catId, direction) => {
+    setCategories(prev => {
+      const activeCats = prev[activeTab] || [];
+      const index = activeCats.findIndex(c => c.id === catId);
+      if (index < 0) return prev;
+
+      const targetIndex = direction === 'left' ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= activeCats.length) return prev;
+
+      const newCats = [...activeCats];
+      const [movedCat] = newCats.splice(index, 1);
+      newCats.splice(targetIndex, 0, movedCat);
 
       return {
         ...prev,
@@ -463,6 +511,16 @@ export default function App() {
   const handleDropTaskToCategory = (taskId, targetCategoryId) => {
     setTasks(prev => prev.map(t => {
       if (t.id === taskId) {
+        // If dropped onto the Urgent column, mark as Urgent without losing home category!
+        if (targetCategoryId === 'urgent-auto-col') {
+          return {
+            ...t,
+            isHighPriority: true,
+            scheduledDay: null
+          };
+        }
+
+        // Dropping into a standard category updates home categoryId
         return {
           ...t,
           categoryId: targetCategoryId,
@@ -490,7 +548,10 @@ export default function App() {
     e.preventDefault();
     if (!newCategoryName.trim()) return;
 
-    const colors = ['#06b6d4', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#3b82f6', '#14b8a6'];
+    let colors = ['#06b6d4', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#3b82f6', '#14b8a6'];
+    if (activeTab === 'ap') colors = ['#F8B4C5'];
+    else if (activeTab === 'work') colors = ['#FBBC04'];
+
     const icons = ['tag', 'star', 'sparkles', 'bookmark', 'coffee', 'zap', 'target'];
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
     const randomIcon = icons[Math.floor(Math.random() * icons.length)];
@@ -712,6 +773,16 @@ export default function App() {
 
         {/* Header Actions */}
         <div className="header-controls">
+          {/* Flame Emoji Urgent Toggle Button */}
+          <button 
+            className={`icon-btn ${showUrgentColumn ? 'active-urgent' : ''}`}
+            onClick={() => setShowUrgentColumn(prev => !prev)}
+            title={`${showUrgentColumn ? 'Hide' : 'Show'} Urgent Column (🔥)`}
+            style={showUrgentColumn ? { color: '#ef4444', borderColor: '#fca5a5', background: 'rgba(239, 68, 68, 0.12)' } : {}}
+          >
+            <Flame size={15} />
+          </button>
+
           {/* Completed Archive Button */}
           <button 
             className="action-btn-sm"
@@ -769,6 +840,7 @@ export default function App() {
           isExpanded={isPlannerExpanded}
           onToggleExpand={() => setIsPlannerExpanded(prev => !prev)}
           tasks={tasks.filter(t => !t.isCompleted)}
+          tabs={tabs}
           onToggleComplete={handleToggleComplete}
           onTogglePriority={handleTogglePriority}
           onUpdateTaskTitle={handleUpdateTaskTitle}
@@ -776,6 +848,24 @@ export default function App() {
           onDeleteTask={handleDeleteTask}
           onDropTaskToDay={handleDropTaskToDay}
         />
+
+        {/* Iconic Google 4-Color Stripe Visual Divider (Work Tab Only) */}
+        {activeTab === 'work' && (
+          <div 
+            className="google-stripe-divider" 
+            style={{
+              display: 'flex',
+              gap: '6px',
+              margin: '0.2rem 0 0.5rem 0',
+              width: '100%'
+            }}
+          >
+            <div style={{ flex: 1, height: '3px', backgroundColor: '#4285F4', borderRadius: '2px' }} title="Google Blue" />
+            <div style={{ flex: 1, height: '3px', backgroundColor: '#EA4335', borderRadius: '2px' }} title="Google Red" />
+            <div style={{ flex: 1, height: '3px', backgroundColor: '#FBBC04', borderRadius: '2px' }} title="Google Yellow" />
+            <div style={{ flex: 1, height: '3px', backgroundColor: '#34A853', borderRadius: '2px' }} title="Google Green" />
+          </div>
+        )}
 
         {/* ========================================================================= */}
         {/* CATEGORY COLUMNS GRID OR GLOBAL SEARCH RESULTS VIEW                       */}
@@ -822,13 +912,18 @@ export default function App() {
               </form>
             )}
 
-            <div className="categories-container" style={{ marginTop: '0.85rem' }}>
-              {/* Left-most Urgent Column */}
-              {urgentTabTasks.length > 0 && (
+            {/* Clean Column Grid Container - Zero Dotted Cards */}
+            <div 
+              className="categories-container" 
+              style={{ marginTop: '0.85rem' }}
+            >
+              {/* Left-most Urgent Column (Toggled via Flame 🔥 Header Button) */}
+              {showUrgentColumn && urgentTabTasks.length > 0 && (
                 <CategoryColumn
                   key="urgent-auto-col"
                   category={autoUrgentCategory}
                   tasks={urgentTabTasks}
+                  tabId={activeTab}
                   onToggleComplete={handleToggleComplete}
                   onTogglePriority={handleTogglePriority}
                   onUpdateTaskTitle={handleUpdateTaskTitle}
@@ -837,7 +932,7 @@ export default function App() {
                 />
               )}
 
-              {currentCategories.map(cat => {
+              {currentCategories.map((cat, index) => {
                 const catTasks = activeTabTasks
                   .filter(t => t.categoryId === cat.id)
                   .sort((a, b) => (b.isHighPriority ? 1 : 0) - (a.isHighPriority ? 1 : 0));
@@ -847,6 +942,10 @@ export default function App() {
                     key={cat.id}
                     category={cat}
                     tasks={catTasks}
+                    tabId={activeTab}
+                    canMoveLeft={index > 0}
+                    canMoveRight={index < currentCategories.length - 1}
+                    onMoveDirection={handleMoveCategoryDirection}
                     onAddTask={handleAddTask}
                     onToggleComplete={handleToggleComplete}
                     onTogglePriority={handleTogglePriority}

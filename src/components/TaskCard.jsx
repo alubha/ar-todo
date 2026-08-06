@@ -8,7 +8,8 @@ export default function TaskCard({
   onTogglePriority, 
   onUpdateTaskTitle,
   onUnscheduleTask,
-  onDragStart
+  onDragStart,
+  tabInfo
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
@@ -64,6 +65,23 @@ export default function TaskCard({
       }}
     >
       <div className="task-card-main">
+        {/* Origin Tab Dot (Matching Tab Header Color) */}
+        {tabInfo && (
+          <span 
+            className="task-origin-dot"
+            style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              backgroundColor: tabInfo.bg,
+              flexShrink: 0,
+              marginRight: '2px',
+              display: 'inline-block'
+            }}
+            title={`From '${tabInfo.name}' tab`}
+          />
+        )}
+
         {/* Task Title (Click to Edit) */}
         {isEditing ? (
           <input
